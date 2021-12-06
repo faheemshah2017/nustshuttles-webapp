@@ -1,0 +1,45 @@
+{
+    "site_settings": {
+        "site_name": "Nust Shuttles",
+        "date_time_format": "YYYY-MM-DD HH:mm:ss",
+        "date_format": "YYYY-MM-DD",
+        "time_format": "H:mm:ss",
+        "time_zone": "asia/karachi"
+    },
+    "plugins": {
+        "default": [
+            "perfect-scrollbar",
+            "animate",
+            "line-awesome",
+            "flaticon",
+            "fontawesome5",
+            "jquery",
+            "bootstrap",
+            "js-cookie",
+            "block-ui"
+        ]
+    },
+    "settings": {
+        "sessions": {
+            "secret": "XFtjGYafQbfS1dvEbBKP5Q2HccIDT9Lo"
+        },
+        "map":{
+            "key":"AIzaSyDpx_pUdrVXPkpH8d36RDyvIY1HrEA082E"
+        },
+        "db": {
+            "type": "mongo",
+            "host": "localhost",
+            "port": "27017",
+            "username": "",
+            "password": "",
+            "dbName": "nustshuttles",
+            "authMechanism": "DEFAULT",
+            "options": {
+                "poolSize": 10,
+                "bufferMaxEntries": 0,
+                "useNewUrlParser": true,
+                "useUnifiedTopology": true
+            }
+        }
+    }
+}

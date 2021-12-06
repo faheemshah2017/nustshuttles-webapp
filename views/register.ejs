@@ -1,0 +1,130 @@
+<%- include('./partials/header') %>
+
+  <body class="bg-gradient-login">
+    <!-- Register Content -->
+    <div class="container-login">
+      <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12 col-md-9">
+          <div class="card shadow-sm my-5">
+            <div class="card-body p-0">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="login-form">
+                    <div class="text-center">
+                      <h1 class="h4 text-gray-900 mb-4">Register</h1>
+                    </div>
+                    <form id="userform">
+                      <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" name="firstName" id="firstName"
+                          placeholder="Enter First Name">
+                        <label class="invalid-feedback">First Name is required</label>
+                      </div>
+                      <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" name="lastName" id="lastName"
+                          placeholder="Enter Last Name">
+                        <label class="invalid-feedback">Last Name is required</label>
+                      </div>
+                      <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
+                          placeholder="Enter Email Address">
+                        <label class="invalid-feedback email-feedback">Email is required</label>
+                      </div>
+                      <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                          placeholder="Password">
+                        <label class="invalid-feedback">Password is required</label>
+                      </div>
+                      <div class="form-group">
+                        <label>Repeat Password</label>
+                        <input type="password" class="form-control" name="repeatPassword" id="repeatPassword"
+                          placeholder="Repeat Password">
+                        <label class="invalid-feedback repeatPassword-feedback">Repeat Password is required</label>
+                      </div>
+                      <div class="form-group">
+                        <button onclick="register(event)" class="btn btn-primary btn-block">Register</button>
+                      </div>
+                      <hr>
+                    </form>
+                    <hr>
+                    <div class="text-center">
+                      <a class="font-weight-bold small" href="/login">Already have an account?</a>
+                    </div>
+                    <div class="text-center">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Register Content -->
+    <%- include('./partials/plugins') %>
+
+      <script>
+        function register(e) {
+          e.preventDefault();
+          var array = $("#userform").serializeArray();
+          let formData = {}
+          array.forEach(e => {
+            formData[e.name] = e.value;
+          })
+          $("#firstName").removeClass("is-invalid");
+          $("#lastName").removeClass("is-invalid");
+          $("#email").removeClass("is-invalid");
+          $("#password").removeClass("is-invalid");
+          $("#repeatPassword").removeClass("is-invalid");
+          if (formData.firstName.length < 1) {
+            $("#firstName").addClass("is-invalid");
+          }
+          else if (formData.lastName.length < 1) {
+            $("#lastName").addClass("is-invalid");
+          }
+          else if (formData.email.length < 1) {
+            $("#email").addClass("is-invalid");
+            $(".email-feedback").html("Email is required");
+          }
+          else if (formData.password.length < 1) {
+            $("#password").addClass("is-invalid");
+          }
+          else if (formData.repeatPassword.length < 1) {
+            $("#repeatPassword").addClass("is-invalid");
+            $(".repeatPassword-feedback").html("Repeat Password is required");
+          }
+          else if (formData.repeatPassword != formData.password) {
+            $("#repeatPassword").addClass("is-invalid");
+            $(".repeatPassword-feedback").html("Passwords do not match");
+          }
+          else {
+            delete formData.repeatPassword
+            $.ajax({
+              url: "/users/register",
+              data: JSON.stringify(formData),
+              cache: false,
+              processData: false,
+              contentType: 'application/json',
+              type: 'POST',
+              success: function (res) {
+                if(res){
+                  $("#userform").trigger("reset");
+                  swal("Registered!", "User Registered Successfully!", "success");
+                }
+                else{
+                  $("#email").addClass("is-invalid");
+                  $(".email-feedback").html("Email already taken");
+                }
+              }
+            });
+          }
+
+        }
+      </script>
+
+  </body>
+
+  </html>
