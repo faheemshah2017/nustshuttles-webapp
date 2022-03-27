@@ -6,6 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var shuttlesRouter = require('./routes/shuttles');
+var routesRouter = require('./routes/routes');
 
 passport = require('passport');
 session = require('express-session');
@@ -47,6 +49,8 @@ mongodb = require('./lib/mongo_db.js')
 
 mongodb.connectToMongo(function (db_conn) {
     col_users = db_conn.collection('users');
+    col_shuttles = db_conn.collection('shuttles_data');
+    col_routes = db_conn.collection('routes');
     col_settings = db_conn.collection('settings');
 });
 
@@ -99,9 +103,6 @@ app.use(cors());
 
 app.use(flash());
 
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 // Models
 data_model = require('./models/data_model');
 
@@ -117,6 +118,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/shuttles', shuttlesRouter);
+app.use('/routes', routesRouter);
 
 // error handler
 app.use(function(err, req, res, next) {

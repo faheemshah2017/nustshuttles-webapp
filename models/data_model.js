@@ -46,6 +46,16 @@ var data_model = {
             }
         });
     },
+    addAll: function (collection, data, callback) {
+        collection.insertMany(data, function (err, result) {
+            if (err) {
+                console.log(err);
+                return callback(false);
+            } else {
+                return callback(true);
+            }
+        });
+    },
     update: function (collection, row_id, data, update, callback) {
         var query = {
             _id: new ObjectId(row_id)
