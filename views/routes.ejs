@@ -24,21 +24,55 @@
                   <div class="col-xl-12">
                     <select type="text" class="btn btn-primary mb-1" onchange="changeRoute(event)">
                       <option style="background:white;color:black">Select Route</option>
-                      <% routes[0].paths.forEach(path=> {%>
-                        <option style="background:white;color:black" value="<%=path.number-1%>">Route#<%=path.number%>
+                      <% routes.forEach(route=> {%>
+                        <option style="background:white;color:black" value="<%=route._id%>">Route#<%=route.routeNumber%>
+                            -<%=route.pathNumber%>
                         </option>
                         <% }); %>
                     </select>
-                    <button class="btn btn-primary mb-1" style="float: right;"  data-toggle="modal" data-target="#logoutModal">Add +</button>
+                    <button class="btn btn-primary mb-1" style="float: right;display: none;" data-toggle="modal"
+                      id="saveRouteBtn" data-target="#addRouteModal">Save</button>
+                    <button class="btn btn-primary mb-1" style="float: right;display: none;" id="cancelRouteBtn"
+                      onclick="cancelRoute()">Cancel</button>
+
+                    <button class="btn btn-primary mb-1" style="float: right;display: block;" id="addRouteBtn"
+                      onclick="addRoute()">Add +</button>
+
                   </div>
                   <div class="col-lg-12">
                     <div id="map" style="height:480px;"></div>
                   </div>
                 </div>
                 <!--Row-->
+                <!-- Row -->
+                <div class="row">
+                  <!-- Datatables -->
+                  <div class="col-lg-12">
+                    <div class="card mb-4">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Routes List</h6>
+                      </div>
+                      <div class="table-responsive p-3">
+                        <table class="table align-items-center table-flush table-hover" id="dataTableHover">
+                          <thead class="thead-light">
+                            <tr>
+                              <th>Route Number</th>
+                              <th>Path Number</th>
+                              <th>Time From</th>
+                              <th>Time To</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody id="table"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--Row-->
 
                 <!-- Modal Logout -->
-                <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+                <div class="modal fade" id="addRouteModal" tabindex="-1" role="dialog"
                   aria-labelledby="exampleModalLabelLogout" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -49,13 +83,30 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <form>
-                          <textarea style="width: 100%;" rows="9"></textarea>
+                        <form id="data_form">
+                          <div class="form-group">
+                            <label>Route Number</label>
+                            <input type="number" class="form-control" required name="routeNumber" id="routeNumber"
+                              placeholder="Enter Route Number">
+                          </div>
+                          <div class="form-group">
+                            <label>Path Number</label>
+                            <input type="number" class="form-control" required name="pathNumber" id="pathNumber"
+                              placeholder="Enter Path Number">
+                          </div>
+                          <div class="form-group">
+                            <label>Time From</label>
+                            <input type="time" class="form-control" required name="timeFrom" id="timeFrom">
+                          </div>
+                          <div class="form-group">
+                            <label>Time To</label>
+                            <input type="time" class="form-control" required name="timeTo" id="timeTo">
+                          </div>
                         </form>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
-                        <a href="/login" class="btn btn-primary">Add</a>
+                        <button type="submit" class="btn btn-primary" onclick="submitRoute()">Add</button>
                       </div>
                     </div>
                   </div>
@@ -84,98 +135,8 @@
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpx_pUdrVXPkpH8d36RDyvIY1HrEA082E &callback=initMap&libraries=&v=weekly"
     async></script>
   <script>
-    let map;
-
     routes = <%- JSON.stringify(routes); %>;
-    console.log(routes)
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 33.643418, lng: 72.990158 },
-        zoom: 15,
-        restriction: {
-          latLngBounds: {
-            north: 36,
-            south: 24,
-            east: 77,
-            west: 65,
-          },
-        }
-      }, () => {
-        document.getElementById("map").style.height = "800px"
-      });
-
-      map.setHeading(90);
-
-      // Pick your pin (hole or no hole)
-      var pinSVGHole = "M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z";
-      var labelOriginHole = new google.maps.Point(12, 15);
-      var pinSVGFilled = "M 12,2 C 8.1340068,2 5,5.1340068 5,9 c 0,5.25 7,13 7,13 0,0 7,-7.75 7,-13 0,-3.8659932 -3.134007,-7 -7,-7 z";
-      var labelOriginFilled = new google.maps.Point(12, 9);
-
-      fillColor = {
-        0: "#66bb6a",
-        1: "#fc544b",
-        2: "#ffa426"
-      }
-
-      images = {
-        0: "ok",
-        1: "alert",
-        2: "fault"
-      }
-
-      images2 = {
-        0: "offline",
-        1: "online",
-      }
-
-      strokeColor = {
-        0: "#eaecf4",
-        1: "#66bb6a"
-      }
-
-      // devices = []
-      // const markers = shuttles.map((shuttle, i) => {
-      //   if (parseFloat(shuttle.speed) > 5) {
-      //     shuttle.status = "active"
-      //   }
-      //   return new google.maps.Marker({
-      //     position: { lat: parseFloat(shuttle.latitude), lng: parseFloat(shuttle.longitude) },
-      //     icon: {
-      //       url: `/img/${shuttle.status}.png`, // url
-      //       scaledSize: new google.maps.Size(50, 50), // scaled size
-      //     },
-      //     title: "Shuttle# " + shuttle.deviceId
-      //   });
-      // });
-      // new MarkerClusterer(map, markers, {
-      //   imagePath:
-      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-      // });
-    };
-
-    const flightPath = []
-    var lastRoute = 0;
-    function changeRoute(e) {
-      selectRoute(e.target.value)
-    }
-    function selectRoute(routeNumber) {
-      let flightPlanCoordinates = routes[0].paths[routeNumber].path;
-      flightPath[routeNumber] = new google.maps.Polyline({
-        path: flightPlanCoordinates,
-        geodesic: true,
-        strokeColor: "#224879",
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-      });
-      try {
-        flightPath[lastRoute].setMap(null);
-      }
-      catch (e) { }
-      flightPath[routeNumber].setMap(map);
-      lastRoute = routeNumber
-    }
-
   </script>
+  <script src="/js/routes.js"></script>
 
   </html>

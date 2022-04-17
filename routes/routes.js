@@ -3,12 +3,13 @@ var router = express.Router();
 
 router.get('/', function (req, res, next) {
     data_model.getAll(col_routes, (resp) => {
-      data = {
-        title: 'Nust Shuttles',
-        plugins: ['charts'],
-        routes: resp
-      }
-      res.render('routes', data);
+        data = {
+            page: "routes",
+            title: 'Nust Shuttles',
+            plugins: ['charts'],
+            routes: resp
+        }
+        res.render('routes', data);
     })
 });
 router.post('/add', function (req, res, next) {
@@ -19,6 +20,12 @@ router.post('/add', function (req, res, next) {
 
 router.get('/get', function (req, res, next) {
     data_model.getAll(col_routes, (resp) => {
+        res.send(resp)
+    })
+});
+
+router.delete('/delete/:id', function (req, res, next) {
+    data_model.delete(col_routes,req.params.id, (resp) => {
         res.send(resp)
     })
 });
