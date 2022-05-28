@@ -56,10 +56,10 @@ mongodb.connectToMongo(function (db_conn) {
 
 const user = encodeURIComponent(SysConfig.settings.liveDB.username);
 const password = encodeURIComponent(SysConfig.settings.liveDB.password);
-const host = SysConfig.settings.liveDB.host;
-const port = SysConfig.settings.liveDB.port;
-const authMechanism = SysConfig.settings.liveDB.authMechanism;
-const dbName = SysConfig.settings.liveDB.dbName;
+const hostname = SysConfig.settings.liveDB.hostname;
+// const port = SysConfig.settings.liveDB.port;
+// const authMechanism = SysConfig.settings.liveDB.authMechanism;
+// const dbName = SysConfig.settings.liveDB.dbName;
 
 // if (host == 'localhost' || host == '127.0.0.1') {
 //     //DBurl = `mongodb://${host}:${port}/`;
