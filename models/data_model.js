@@ -56,7 +56,7 @@ var data_model = {
             }
         });
     },
-    update: function (collection, row_id, data, update, callback) {
+    update: function (collection, row_id, data, callback) {
         var query = {
             _id: new ObjectId(row_id)
         };

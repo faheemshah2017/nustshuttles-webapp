@@ -1,3 +1,9 @@
+<style>
+  .nav-active{
+  color: #757575;
+  background-color: #eee !important;
+}
+</style>
 <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
       <div class="sidebar-brand-icon">
@@ -14,8 +20,8 @@
     <div class="sidebar-heading">
       Live Tracking
     </div>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap"
+    <!-- <li class="nav-item">
+      <a class="nav-link collapsed" href="/shuttles" data-toggle="collapse" data-target="#collapseBootstrap"
         aria-expanded="true" aria-controls="collapseBootstrap">
         <i class="far fa-fw fa-window-maximize"></i>
         <span>Shuttles</span>
@@ -28,6 +34,12 @@
         </div>
       </div>
     </li>
+    </li> -->
+    <li class="nav-item">
+      <a class="nav-link <% if(page=='shuttles'){ %>nav-active<% } %>" href="/shuttles">
+        <i class="fas fa-fw fa-bus"></i>
+        <span>Shuttles</span>
+      </a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="/">
@@ -35,8 +47,8 @@
         <span>Map</span>
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link <% if(page=='routes'){ %>active<% } %> " href="/routes">
+    <li class="nav-item <% if(page=='routes'){ %>nav-active<% } %>">
+      <a class="nav-link" href="/routes">
         <i class="fas fa-fw fa-road"></i>
         <span>Routes</span>
       </a>

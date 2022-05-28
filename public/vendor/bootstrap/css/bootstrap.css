@@ -4803,6 +4803,11 @@ input[type="button"].btn-block {
   margin-bottom: -1px;
 }
 
+.nav-active{
+  color: #6e707e;
+  background-color: #eee !important;
+}
+
 .nav-tabs .nav-link {
   border: 1px solid transparent;
   border-top-left-radius: 0.35rem;

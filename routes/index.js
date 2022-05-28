@@ -5,6 +5,7 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
   data_model.getAll(col_shuttles, (resp) => {
     data = {
+      page: '',
       title: 'Nust Shuttles',
       plugins: ['charts'],
       shuttles: resp
