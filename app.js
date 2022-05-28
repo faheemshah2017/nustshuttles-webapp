@@ -54,27 +54,29 @@ mongodb.connectToMongo(function (db_conn) {
     col_settings = db_conn.collection('settings');
 });
 
-const user = encodeURIComponent(SysConfig.settings.db.username);
-const password = encodeURIComponent(SysConfig.settings.db.password);
-const host = SysConfig.settings.db.host;
-const port = SysConfig.settings.db.port;
-const authMechanism = SysConfig.settings.db.authMechanism;
-const dbName = SysConfig.settings.db.dbName;
+const user = encodeURIComponent(SysConfig.settings.liveDB.username);
+const password = encodeURIComponent(SysConfig.settings.liveDB.password);
+const host = SysConfig.settings.liveDB.host;
+const port = SysConfig.settings.liveDB.port;
+const authMechanism = SysConfig.settings.liveDB.authMechanism;
+const dbName = SysConfig.settings.liveDB.dbName;
 
-if (host == 'localhost' || host == '127.0.0.1') {
-    //DBurl = `mongodb://${host}:${port}/`;
-    if (user == '' || password == '') {
-        DBurl = `mongodb://${host}:${port}/`;
-    } else {
-        DBurl = `mongodb://${user}:${password}@${host}:${port}/${dbName}`;
-    }
-} else {
-    if (user == '' || password == '') {
-        console.log('Authentication Failed, Username and Password is required.');
-    } else {
-        DBurl = `mongodb://${user}:${password}@${host}:${port}/?authMechanism=${authMechanism}&authSource=${dbName}`;
-    }
-}
+// if (host == 'localhost' || host == '127.0.0.1') {
+//     //DBurl = `mongodb://${host}:${port}/`;
+//     if (user == '' || password == '') {
+//         DBurl = `mongodb://${host}:${port}/`;
+//     } else {
+//         DBurl = `mongodb://${user}:${password}@${host}:${port}/${dbName}`;
+//     }
+// } else {
+//     if (user == '' || password == '') {
+//         console.log('Authentication Failed, Username and Password is required.');
+//     } else {
+//         DBurl = `mongodb://${user}:${password}@${host}:${port}/?authMechanism=${authMechanism}&authSource=${dbName}`;
+//     }
+// }
+
+DBurl = `mongodb+srv://${user}:${password}@${hostname}/?retryWrites=true&w=majority`;
 
 app.use(session({
   key: 'sid',
