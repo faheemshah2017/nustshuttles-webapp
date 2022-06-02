@@ -112,7 +112,9 @@
               success: function (res) {
                 if(res){
                   $("#userform").trigger("reset");
-                  swal("Registered!", "User Registered Successfully!", "success");
+                  swal("Registered!", "User Registered Successfully!", "success").then(res=>{
+                    window.location.href = "/login";
+                  });
                 }
                 else{
                   $("#email").addClass("is-invalid");

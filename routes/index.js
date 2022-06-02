@@ -1,8 +1,9 @@
 var express = require('express');
+const { authUser } = require('../models/user_model');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', authUser, function (req, res, next) {
   data_model.getAll(col_shuttles, (resp) => {
     data = {
       page: '',

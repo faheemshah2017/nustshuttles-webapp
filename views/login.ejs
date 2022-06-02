@@ -13,13 +13,13 @@
                   <div class="text-center">
                     <h1 class="h4 text-gray-900 mb-4">Login</h1>
                   </div>
-                  <form class="user">
+                  <form class="user" action="/users/auth" method="post">
                     <div class="form-group">
-                      <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp"
+                      <input type="email" class="form-control" required name="email" id="exampleInputEmail" aria-describedby="emailHelp"
                         placeholder="Enter Email Address">
                     </div>
                     <div class="form-group">
-                      <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password">
+                      <input type="password" class="form-control" required name="password" id="exampleInputPassword" placeholder="Password">
                     </div>
                     <div class="form-group">
                       <div class="custom-control custom-checkbox small" style="line-height: 1.5rem;">
@@ -29,9 +29,16 @@
                       </div>
                     </div>
                     <div class="form-group">
-                      <a href="/" class="btn btn-primary btn-block">Login</a>
-                    </div>
+                      <input type="submit" value="Log In" class="btn btn-primary btn-block"/>
+                      <!-- <a href="/" class="btn btn-primary btn-block">Login</a> -->
+                    </div><a class="font-weight-bold small" href="/forgot">Forgot Password?</a>
                     <hr>
+                    <!-- <a href="index.html" class="btn btn-google btn-block">
+                      <i class="fab fa-google fa-fw"></i> Login with Google
+                    </a>
+                    <a href="index.html" class="btn btn-facebook btn-block">
+                      <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
+                    </a> -->
                   </form>
                   <hr>
                   <div class="text-center">

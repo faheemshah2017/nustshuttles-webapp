@@ -106,6 +106,7 @@ app.use(cors());
 app.use(flash());
 
 // Models
+user_model = require('./models/user_model');
 data_model = require('./models/data_model');
 
 // view engine setup
