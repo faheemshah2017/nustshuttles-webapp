@@ -196,7 +196,7 @@ router.delete('/delete', function(req, res, next) {
     
 });
 
-router.get('/logout', authUser, function(req, res) {
+router.get('/logout', function(req, res) {
     req.logout();
     req.flash('info', 'You are logged out');
     res.redirect('/login');

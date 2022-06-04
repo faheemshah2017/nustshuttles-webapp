@@ -254,20 +254,20 @@ var user_model = {
             return callback(true);
         });
     },
-    // authUser: function (req, res, next) {
-    //     passport.authenticate('local', {
-    //         successRedirect: '/',
-    //         failureRedirect: '/login',
-    //         failureFlash: true
-    //     })(req, res, next);
-    // },
-
-    authUser: function (req, res, callback) {
-        passport.authenticate('local', function(err, user, info) {
-            console.log(user,info)
-            return callback(user,info);
-        })(req, res);
+    authUser: function (req, res, next) {
+        passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/login',
+            failureFlash: true
+        })(req, res, next);
     },
+
+    // authUser: function (req, res, callback) {
+    //     passport.authenticate('local', function(err, user, info) {
+    //         console.log(user,info)
+    //         return callback(user,info);
+    //     })(req, res);
+    // },
 };
 
 module.exports = user_model;
