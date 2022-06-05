@@ -43,6 +43,7 @@ router.get('/', authUser, function (req, res, next) {
         title: 'Nust Shuttles',
         plugins: ['charts'],
         shuttles: resp,
+        tracking: tracking,
         user: req.user,
       }
       res.render('index', data);
