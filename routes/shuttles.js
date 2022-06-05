@@ -55,9 +55,11 @@ router.get('/location', function (req, res, next) {
 });
 
 router.post('/sendLocation', (req, res, next) => {
+  console.log(req.body)
   data_model.add(col_shuttlesData, req.body, (resp) => {
     console.log(req.body.deviceId)
     data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
+      console.log(resp)
       res.send(resp)
     })
   })

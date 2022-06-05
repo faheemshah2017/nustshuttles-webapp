@@ -73,7 +73,7 @@ var data_model = {
 
         var query = {}
         query[key] = value;
-
+        console.log(query)
         collection.updateOne(query, { $set: data },{ upsert: true }, function (err, res) {
             if (err) {
                 throw err;
