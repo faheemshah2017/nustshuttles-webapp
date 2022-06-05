@@ -75,7 +75,7 @@ router.get('/shuttleLocation', function (req, res, next) {
   })
 });
 
-router.get('/settings', authUser,saveLogs("Checked Settings"), function (req, res, next) {
+router.get('/settings', authUser, function (req, res, next) {
   if (req.user.role != "manager") {
     res.redirect('/');
   } else {

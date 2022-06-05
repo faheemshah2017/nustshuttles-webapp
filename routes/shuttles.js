@@ -9,6 +9,7 @@ router.get('/', function (req, res, next) {
         title: 'Nust Shuttles',
         plugins: ['charts'],
         shuttles: shuttles,
+        user: req.user,
         routes: routes
       }
       res.render('shuttles', data);
@@ -52,5 +53,13 @@ router.get('/location', function (req, res, next) {
     res.send(resp)
   })
 });
+
+router.post('/sendLocation',(req, res, next)=>{
+  console.log(req.body)
+  data_model.add(col_tracking, req.body, (resp) => {
+    console.log(resp)
+    res.send(resp)
+  })
+})
 
 module.exports = router;

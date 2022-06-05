@@ -54,6 +54,7 @@ mongodb.connectToMongo(function (db_conn) {
     col_settings = db_conn.collection('settings');
     col_alerts = db_conn.collection('alerts');
     col_logs = db_conn.collection('logs');
+    col_tracking = db_conn.collection('tracking');
 });
 
 const user = encodeURIComponent(SysConfig.settings.liveDB.username);

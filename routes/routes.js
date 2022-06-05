@@ -7,12 +7,13 @@ router.get('/', function (req, res, next) {
             page: "routes",
             title: 'Nust Shuttles',
             plugins: ['charts'],
+            user: req.user,
             routes: resp
         }
         res.render('routes', data);
     })
 });
-router.post('/add', function (req, res, next) {
+router.post('/add',saveLogs("Added Route"), function (req, res, next) {
     data_model.add(col_routes, req.body, (resp) => {
         res.send(resp)
     })
