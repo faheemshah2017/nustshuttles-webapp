@@ -39,6 +39,7 @@
                         <table class="table align-items-center table-flush table-hover" id="dataTableHover">
                           <thead class="thead-light">
                             <tr>
+                              <th>Shuttle Id</th>
                               <th>Number</th>
                               <th>Route</th>
                               <th>Total Trips</th>
@@ -72,6 +73,11 @@
                       <div class="modal-body">
                         <form id="data_form">
                           <input id="rowId" name="rowId" style="display: none;">
+                          <div class="form-group">
+                            <label>Shuttle ID</label>
+                            <input type="number" class="form-control" required name="deviceId" id="deviceId"
+                              placeholder="Enter Device ID">
+                          </div>
                           <div class="form-group">
                             <label>Shuttle Number</label>
                             <input type="number" class="form-control" required name="shuttleNumber" id="shuttleNumber"

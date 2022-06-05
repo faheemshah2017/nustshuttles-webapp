@@ -299,13 +299,13 @@ function getShuttleById(shuttleID){
 setShuttlesTable(shuttles);
 
 function setShuttlesTable(shuttles) {
-
     $("#table").html("");
     let row = "";
 
     shuttles.forEach((shuttle, i) => {
 
-        row += `<tr><td>${shuttle.shuttleNumber}</td>
+        row += `<tr><td>${shuttle.deviceId}</td>
+        <td>${shuttle.shuttleNumber}</td>
       <td>${shuttle.routeNumber}</td>
       <td>${shuttle.shuttleNumber}</td>`;
       

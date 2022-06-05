@@ -49,13 +49,13 @@ mongodb = require('./lib/mongo_db.js')
 
 mongodb.connectToMongo(function (db_conn) {
     col_users = db_conn.collection('users');
-    col_shuttles = db_conn.collection('shuttles_data');
+    col_shuttles = db_conn.collection('shuttles');
     col_routes = db_conn.collection('routes');
     col_settings = db_conn.collection('settings');
     col_alerts = db_conn.collection('alerts');
     col_logs = db_conn.collection('logs');
     col_tracking = db_conn.collection('tracking');
-    col_shuttlesData = db_conn.collection('col_shuttlesData');
+    col_shuttlesData = db_conn.collection('shuttlesData');
 });
 
 const user = encodeURIComponent(SysConfig.settings.liveDB.username);
