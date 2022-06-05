@@ -278,6 +278,7 @@ function updateShuttle() {
 function editShuttle(e){
     let shuttle = getShuttleById(e.id)
     document.getElementById("rowId").value = shuttle._id
+    document.getElementById("deviceId").value = shuttle.deviceId
     document.getElementById("shuttleNumber").value = shuttle.shuttleNumber
     document.getElementById("shuttleRoute").value = shuttle.shuttleRoute
     document.getElementById("addBtn").style.display = 'none'

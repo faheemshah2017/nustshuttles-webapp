@@ -8,7 +8,7 @@ const myLatlng = { lat: 33.643418, lng: 72.990158 };
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 33.643418, lng: 72.990158 },
-        zoom: 15,
+        zoom: 16,
         restriction: {
             latLngBounds: {
                 north: 36,
@@ -16,12 +16,12 @@ function initMap() {
                 east: 77,
                 west: 65,
             },
-        }
+        },
+        heading: -32.5,
+        mapId: "90f87356969d889c",
     }, () => {
         document.getElementById("map").style.height = "800px"
     });
-
-    map.setHeading(90);
 
     // Pick your pin (hole or no hole)
     var pinSVGHole = "M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z";

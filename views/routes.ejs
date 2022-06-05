@@ -20,30 +20,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Routes</li>
                   </ol>
                 </div>
-                <div class="row mb-3">
-                  <div class="col-xl-12">
-                    <select type="text" class="btn btn-primary mb-1" onchange="changeRoute(event)">
-                      <option style="background:white;color:black">Select Route</option>
-                      <% routes.forEach(route=> {%>
-                        <option style="background:white;color:black" value="<%=route._id%>">Route#<%=route.routeNumber%>
-                            -<%=route.pathNumber%>
-                        </option>
-                        <% }); %>
-                    </select>
-                    <button class="btn btn-primary mb-1" style="float: right;display: none;" data-toggle="modal"
-                      id="saveRouteBtn" data-target="#addRouteModal">Save</button>
-                    <button class="btn btn-primary mb-1" style="float: right;display: none;" id="cancelRouteBtn"
-                      onclick="cancelRoute()">Cancel</button>
-
-                    <button class="btn btn-primary mb-1" style="float: right;display: block;" id="addRouteBtn"
-                      onclick="addRoute()">Add +</button>
-
-                  </div>
-                  <div class="col-lg-12">
-                    <div id="map" style="height:480px;"></div>
-                  </div>
-                </div>
-                <!--Row-->
+                
                 <!-- Row -->
                 <div class="row">
                   <!-- Datatables -->
@@ -67,6 +44,30 @@
                         </table>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <!--Row-->
+                <div class="row mb-3">
+                  <div class="col-xl-12">
+                    <select type="text" class="btn btn-primary mb-1" onchange="changeRoute(event)">
+                      <option style="background:white;color:black">Select Route</option>
+                      <% routes.forEach(route=> {%>
+                        <option style="background:white;color:black" value="<%=route._id%>">Route#<%=route.routeNumber%>
+                            -<%=route.pathNumber%>
+                        </option>
+                        <% }); %>
+                    </select>
+                    <button class="btn btn-primary mb-1" style="float: right;display: none;" data-toggle="modal"
+                      id="saveRouteBtn" data-target="#addRouteModal">Save</button>
+                    <button class="btn btn-primary mb-1" style="float: right;display: none;" id="cancelRouteBtn"
+                      onclick="cancelRoute()">Cancel</button>
+
+                    <button class="btn btn-primary mb-1" style="float: right;display: block;" id="addRouteBtn"
+                      onclick="addRoute()">Add +</button>
+
+                  </div>
+                  <div class="col-lg-12">
+                    <div id="map" style="height:800px;"></div>
                   </div>
                 </div>
                 <!--Row-->
