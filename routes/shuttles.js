@@ -30,14 +30,14 @@ router.post('/add', function (req, res, next) {
 });
 
 router.delete('/delete/:id', function (req, res, next) {
-  data_model.delete(col_shuttles,req.params.id, (resp) => {
-      res.send(resp)
+  data_model.delete(col_shuttles, req.params.id, (resp) => {
+    res.send(resp)
   })
 });
 
 router.post('/update/:id', function (req, res, next) {
-  data_model.update(col_shuttles,req.params.id, req.body, (resp) => {
-      res.send(resp)
+  data_model.update(col_shuttles, req.params.id, req.body, (resp) => {
+    res.send(resp)
   })
 });
 
@@ -54,11 +54,11 @@ router.get('/location', function (req, res, next) {
   })
 });
 
-router.post('/sendLocation',(req, res, next)=>{
-  console.log(req.body)
-  data_model.add(col_tracking, req.body, (resp) => {
-    console.log(resp)
-    res.send(resp)
+router.post('/sendLocation', (req, res, next) => {
+  data_model.add(col_shuttlesData, req.body, (resp) => {
+    data_model.update(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
+      res.send(resp)
+    })
   })
 })
 

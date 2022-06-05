@@ -1,5 +1,5 @@
 var data_model = {
-    getAll: function (collection,callback) {
+    getAll: function (collection, callback) {
         var query = {};
 
         collection.find(query).count(function (err, count) {
@@ -12,7 +12,7 @@ var data_model = {
             });
         });
     },
-    get: function (collection,id, callback) {
+    get: function (collection, id, callback) {
         var query = {
             _id: new ObjectId(id)
         };
@@ -27,7 +27,7 @@ var data_model = {
             });
         });
     },
-    getBy: function (collection,key,value, callback) {
+    getBy: function (collection, key, value, callback) {
         var query = {}
         query[key] = value;
 
@@ -60,6 +60,19 @@ var data_model = {
         var query = {
             _id: new ObjectId(row_id)
         };
+
+        collection.updateOne(query, { $set: data }, function (err, res) {
+            if (err) {
+                throw err;
+            }
+
+            return callback(true);
+        });
+    },
+    updateBy: function (collection, key, value, data, callback) {
+
+        var query = {}
+        query[key] = value;
 
         collection.updateOne(query, { $set: data }, function (err, res) {
             if (err) {

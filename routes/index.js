@@ -4,31 +4,31 @@ var router = express.Router();
 authUser = function (req, res, next) {
   console.log(req.user)
   if (req.isAuthenticated()) {
-      console.log('User logged in');
-      next()
+    console.log('User logged in');
+    next()
   } else {
-      console.log('User not logged in');
-      res.redirect('/login');
+    console.log('User not logged in');
+    res.redirect('/login');
   }
 }
 
 saveLogs = message => {
   return (req, res, next) => {
-      let log = ""
-      if(req.body.id){
-          log = `${Date()}: ${req.user.firstName} ${req.user.lastName} ${message} ${req.body.id}`;
-      }
-      else{
-          log = `${Date()}: ${req.user.firstName} ${req.user.lastName} ${message}`;
-      }
-      let data = {
-          message:log,
-          user:req.user,
-          time:Date()
-      }
-      col_logs.insertOne(data, function (err, res) {
-          next();
-      });
+    let log = ""
+    if (req.body.id) {
+      log = `${Date()}: ${req.user.firstName} ${req.user.lastName} ${message} ${req.body.id}`;
+    }
+    else {
+      log = `${Date()}: ${req.user.firstName} ${req.user.lastName} ${message}`;
+    }
+    let data = {
+      message: log,
+      user: req.user,
+      time: Date()
+    }
+    col_logs.insertOne(data, function (err, res) {
+      next();
+    });
   }
 }
 
@@ -36,14 +36,17 @@ saveLogs = message => {
 router.get('/', authUser, function (req, res, next) {
   console.log(req.user)
   data_model.getAll(col_shuttles, (resp) => {
-    data = {
-      page: '',
-      title: 'Nust Shuttles',
-      plugins: ['charts'],
-      shuttles: resp,
-      user: req.user,
-    }
-    res.render('index', data);
+    data_model.getAll(col_tracking, (tracking) => {
+      console.log(tracking)
+      data = {
+        page: '',
+        title: 'Nust Shuttles',
+        plugins: ['charts'],
+        shuttles: resp,
+        user: req.user,
+      }
+      res.render('index', data);
+    });
   })
 });
 
@@ -79,10 +82,10 @@ router.get('/settings', authUser, function (req, res, next) {
   if (req.user.role != "manager") {
     res.redirect('/');
   } else {
-    data_model.getAll(col_settings,(settings)=>{
+    data_model.getAll(col_settings, (settings) => {
       user_model.getUsers(function (users) {
-        data_model.getAll(col_alerts,function (alerts) {
-          data_model.getAll(col_logs,function (logs) {
+        data_model.getAll(col_alerts, function (alerts) {
+          data_model.getAll(col_logs, function (logs) {
             const data = {
               title: 'Settings',
               settings: settings,
