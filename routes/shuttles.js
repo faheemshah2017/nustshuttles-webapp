@@ -63,7 +63,7 @@ router.post('/sendLocation', (req, res, next) => {
       console.log("shuttle",shuttle)
       if(shuttle){
         req.body.busNumber = shuttle.shuttleNumber;
-        ref.child(req.body.deviceId).set(req.body);
+        // ref.child(req.body.deviceId).set(req.body);
         delete req.body.busNumber
       }
       delete req.body.longitude
