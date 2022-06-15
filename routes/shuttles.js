@@ -64,6 +64,7 @@ router.post('/sendLocation', (req, res, next) => {
       if(shuttle){
         req.body.busNumber = shuttle.shuttleNumber;
         // ref.child(req.body.deviceId).set(req.body);
+        await saveDataToFirebase(req.body.deviceId,req.bod)
         delete req.body.busNumber
       }
       delete req.body.longitude
@@ -74,5 +75,9 @@ router.post('/sendLocation', (req, res, next) => {
     })
   })
 })
+
+const saveDataToFirebase = async (collection,data) => {
+  return ref.orderByChild(collection).set(data);
+}
 
 module.exports = router;
