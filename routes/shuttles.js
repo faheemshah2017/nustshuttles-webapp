@@ -64,7 +64,8 @@ router.post('/sendLocation', (req, res, next) => {
       if(shuttle){
         req.body.busNumber = shuttle.shuttleNumber;
         try{
-          await ref.child(req.body.deviceId).set(req.body);
+          const child = ref.child(req.body.deviceId)
+          await child.set(req.body);
         }
         catch(e){
           console.log(e)
