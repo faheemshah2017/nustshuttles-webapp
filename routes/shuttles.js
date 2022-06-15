@@ -63,9 +63,8 @@ router.post('/sendLocation', (req, res, next) => {
       console.log("shuttle",shuttle)
       if(shuttle){
         req.body.busNumber = shuttle.shuttleNumber;
-        // ref.child(req.body.deviceId).set(req.body);
         try{
-          await saveDataToFirebase(req.body.deviceId,req.body)
+          await ref.child(req.body.deviceId).set(req.body);
         }
         catch(e){
           console.log(e)
@@ -80,9 +79,5 @@ router.post('/sendLocation', (req, res, next) => {
     })
   })
 })
-
-const saveDataToFirebase = async (collection,data) => {
-  return ref.child(collection).set(data);
-}
 
 module.exports = router;
