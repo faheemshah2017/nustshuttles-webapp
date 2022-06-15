@@ -59,7 +59,7 @@ router.post('/sendLocation', (req, res, next) => {
   data_model.add(col_shuttlesData, req.body, (resp) => {
     console.log(req.body.deviceId)
     req.body.logitude = req.body.longitude
-    data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, (shuttle) => {
+    data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
       console.log("shuttle",shuttle)
       if(shuttle){
         req.body.busNumber = shuttle.shuttleNumber;
