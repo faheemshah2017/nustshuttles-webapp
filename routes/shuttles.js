@@ -65,7 +65,7 @@ router.post('/sendLocation', (req, res, next) => {
         req.body.busNumber = shuttle.shuttleNumber;
         // ref.child(req.body.deviceId).set(req.body);
         try{
-          await saveDataToFirebase(req.body.deviceId,req.bod)
+          await saveDataToFirebase(req.body.deviceId,req.body)
         }
         catch(e){
           console.log(e)
