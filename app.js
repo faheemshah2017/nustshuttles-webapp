@@ -13,10 +13,15 @@ passport = require('passport');
 session = require('express-session');
 var cors = require('cors');
 
+var firebaseAdmin = require("firebase-admin");
+
 var flash = require('connect-flash');
 MongoStore = require('connect-mongo')(session)
 appRoot = path.resolve(__dirname);
 SysConfig = require(appRoot + "/config/sys_config.json");
+
+// Fetch the service account key JSON file contents
+var serviceAccount = require(appRoot + "/config/nust-shuttles-firebase-adminsdk-wbztk-a11f61a0c1.json");
 
 MongoClient = require('mongodb').MongoClient;
 assert = require('assert');
@@ -34,6 +39,20 @@ authSecurity = function (req, res, next) {
         res.redirect('/login');
     }
 }
+
+// Initialize the app with a service account, granting admin privileges
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
+  // The database URL depends on the location of the database
+  databaseURL: "https://nust-shuttles-default-rtdb.firebaseio.com"
+});
+
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = firebaseAdmin.database();
+ref = db.ref("/");
+// ref.once("value", function (snapshot) {
+//   console.log(snapshot.val());
+// });
 
 authUser = function (req, res, next) {
     if (req.isAuthenticated()) {

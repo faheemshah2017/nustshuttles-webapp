@@ -36,6 +36,20 @@ var data_model = {
             return callback(count);
         });
     },
+    getDataBy: function (collection, key, value, callback) {
+        var query = {};
+        query[key] = value;
+
+        collection.find(query).count(function (err, count) {
+            if (err) throw err;
+
+            collection.find(query).toArray(function (err, result) {
+                if (err) throw err;
+
+                return callback(result[0]);
+            });
+        });
+    },
     add: function (collection, data, callback) {
         collection.insertOne(data, function (err, result) {
             if (err) {
