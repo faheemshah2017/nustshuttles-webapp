@@ -58,21 +58,25 @@ router.post('/sendLocation', (req, res, next) => {
   console.log(req.body)
   data_model.add(col_shuttlesData, req.body, (resp) => {
     console.log(req.body.deviceId)
-    req.body.logitude = req.body.longitude
     data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
       console.log("shuttle",shuttle)
+      let data = {
+        deviceId:req.body.deviceId,
+        busNumber:shuttle.shuttleNumber,
+        latitude:req.body.latitude,
+        logitude:req.body.longitude,
+        speed:req.body.speed,
+        time:req.body.time
+      }
       if(shuttle){
-        req.body.busNumber = shuttle.shuttleNumber;
         try{
           const child = ref.child(req.body.deviceId)
-          await child.set(req.body);
+          await child.set(data);
         }
         catch(e){
           console.log(e)
         }
-        delete req.body.busNumber
       }
-      delete req.body.longitude
       delete req.body._id;
       data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
         res.send(resp)
