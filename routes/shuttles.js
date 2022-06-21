@@ -71,7 +71,7 @@ router.post('/sendLocation', (req, res, next) => {
       if(shuttle){
         try{
           const child = ref.child(req.body.deviceId)
-          await child.set(data);
+          await child.update(data);
         }
         catch(e){
           console.log(e)
