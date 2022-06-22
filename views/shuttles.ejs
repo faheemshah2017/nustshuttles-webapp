@@ -22,8 +22,8 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-xl-12">
-                    <button class="btn btn-primary mb-1" style="float: right;" onclick="addShuttleClick()" data-toggle="modal" id="addShuttleBtn"
-                      data-target="#addShutteModal">Add +</button>
+                    <button class="btn btn-primary mb-1" style="float: right;" onclick="addShuttleClick()"
+                      data-toggle="modal" id="addShuttleBtn" data-target="#addShutteModal">Add +</button>
                   </div>
                 </div>
                 <!--Row-->
@@ -41,8 +41,6 @@
                             <tr>
                               <th>Shuttle Id</th>
                               <th>Number</th>
-                              <th>Route</th>
-                              <th>Total Trips</th>
                               <th>Locate</th>
                               <th>Action</th>
                             </tr>
@@ -62,7 +60,7 @@
                 <!-- Modal Logout -->
                 <div class="modal fade" id="addShutteModal" tabindex="-1" role="dialog"
                   aria-labelledby="exampleModalLabelLogout" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
+                  <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabelLogout">Add Shuttle</h5>
@@ -85,19 +83,37 @@
                           </div>
                           <div class="form-group">
                             <label>Shuttle Route</label>
-                            <select type="text" required name="shuttleRoute" id="shuttleRoute" class="form-control">
-                              <% routes.forEach(route=> {%>
-                                <option style="background:white;color:black" value="<%=route._id%>">Route#<%=route.routeNumber%>
-                                </option>
-                                <% }); %>
-                            </select>
+                            <div class="row">
+                              <div class="col-md-3">
+                                <select type="text" required id="shuttleRoute" class="form-control">
+                                  <% routes.forEach(route=> {%>
+                                    <option style="background:white;color:black" value="<%=route._id%>">
+                                      <%=route.routeTitle%>-<%=route.pathNumber%>
+                                    </option>
+                                    <% }); %>
+                                </select>
+                              </div>
+                              <div class="col-md-3">
+                                <input type="time" class="form-control" required id="timeFrom">
+                              </div>
+                              <div class="col-md-3">
+                                <input type="time" class="form-control" required id="timeTo">
+                              </div>
+                              <div class="col-md-3">
+                                <span class="btn btn-outline-primary btn-block" onclick="addRoute()">Add</span>
+                              </div>
+                            </div>
+                            
+                            <div id="routesList">
+                            </div>
                           </div>
                         </form>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="addBtn" onclick="addShuttle()">Add</button>
-                        <button type="submit" class="btn btn-primary" id="updateBtn" onclick="updateShuttle()">Update</button>
+                        <button type="submit" class="btn btn-primary" id="updateBtn"
+                          onclick="updateShuttle()">Update</button>
                       </div>
                     </div>
                   </div>

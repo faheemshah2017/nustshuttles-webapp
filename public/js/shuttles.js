@@ -118,81 +118,52 @@ function initMap() {
     //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
     // });
 };
-
-function cancelRoute() {
-    $("#saveRouteBtn").css("display", "none");
-    $("#cancelRouteBtn").css("display", "none");
-    $("#addRouteBtn").css("display", "block");
-    showLabels();
-    addingRoute = false;
-    // Close the current InfoWindow.
-    infoWindow.close();
-    newRoute = [];
-    try {
-        flightPath[lastRoute].setMap(null);
-    }
-    catch (e) { }
+routesList = []
+function addRoute(){
+    routesList.push({
+        id: Date.now(),
+        _id:$("#shuttleRoute").val(),
+        title:($("#shuttleRoute option:selected").text()).replaceAll(" ",""),
+        from:$("#timeFrom").val(),
+        to:$("#timeTo").val(),
+        path:getRoutePath($("#shuttleRoute").val())
+    })
+    updateList()
 }
 
-function addRoute() {
-    $("#saveRouteBtn").css("display", "block");
-    $("#cancelRouteBtn").css("display", "block");
-    $("#addRouteBtn").css("display", "none");
-    newRoute = [];
-    addingRoute = true;
-    // Create a new InfoWindow.
-    infoWindow = new google.maps.InfoWindow({
-        content: "Click the map to create shuttle",
-        position: myLatlng,
-    });
-
-    try {
-        flightPath[lastRoute].setMap(null);
-    }
-    catch (e) { }
-    infoWindow.open(map);
-    hideLabels();
+function updateList(){
+    $("#routesList").html("");
+    routesList.forEach(e=>{
+        $("#routesList").append(`
+        <hr>
+        <div class="row">
+          <div class="col-md-3 pl-4">`+e.title+`
+          </div>
+          <div class="col-md-3 pl-4">`+e.from+`
+          </div>
+          <div class="col-md-3 pl-4">`+e.to+`
+          </div>
+          <div class="col-md-3">
+            <span class="btn btn-outline-danger btn-block" onclick="deleteRoute(`+e.id+`)">Delete</span>
+          </div>
+        </div>`)
+    })
 }
 
-function hideLabels() {
-    map.set('styles', [{
-        featureType: "all",
-        elementType: "labels",
-        stylers: [
-            { visibility: "off" }
-        ]
-    }
-    ]);
+function deleteRoute(id){
+    routesList = routesList.filter(r=> r.id!=id)
+    updateList();
 }
 
-function showLabels() {
-    map.set('styles', []);
-}
-
-const flightPath = []
-var lastRoute = 0;
-function changeRoute(e) {
-    selectRoute(e.target.value)
-}
-function selectRoute(routeID) {
-    let flightPlanCoordinates = shuttles.find(r => r._id == routeID).path;
-    flightPath[routeID] = new google.maps.Polyline({
-        path: flightPlanCoordinates,
-        geodesic: true,
-        strokeColor: "#224879",
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-    });
-    try {
-        flightPath[lastRoute].setMap(null);
-    }
-    catch (e) { }
-    flightPath[routeID].setMap(map);
-    lastRoute = routeID
-}
 
 function getRouteNumber(routeID){
     return (routes.filter(r=>r._id==routeID))[0].routeNumber
+}
+
+function getRoutePath(routeID){
+    let path = (routes.filter(r=>r._id==routeID))[0].path
+    path.map(p=>p.point="nill");
+    return path;
 }
 
 function addShuttle() {
@@ -200,7 +171,7 @@ function addShuttle() {
     $.each($('#data_form').serializeArray(), function (i, field) {
         values[field.name] = field.value;
     });
-    values.routeNumber = getRouteNumber(values.shuttleRoute)
+    values.route = routesList;
 
     $.ajax({
         url: "/shuttles/add",
@@ -226,7 +197,8 @@ function addShuttle() {
                     url: "/shuttles/get",
                     contentType: 'application/json',
                     type: 'GET',
-                    success: function (shuttles) {
+                    success: function (newShuttles) {
+                        shuttles = newShuttles;
                         setShuttlesTable(shuttles);
                     }
                 });
@@ -242,6 +214,7 @@ function updateShuttle() {
     });
     let id  = values.rowId
     delete values.rowId;
+    values.route = routesList;
     $.ajax({
         url: "/shuttles/update/"+id,
         data: JSON.stringify(values),
@@ -266,8 +239,9 @@ function updateShuttle() {
                     url: "/shuttles/get",
                     contentType: 'application/json',
                     type: 'GET',
-                    success: function (shuttles) {
-                        setShuttlesTable(shuttles);
+                    success: function (newShuttles) {
+                        shuttles = newShuttles;
+                        setShuttlesTable(newShuttles);
                     }
                 });
             });
@@ -276,6 +250,7 @@ function updateShuttle() {
 }
 
 function editShuttle(e){
+    routesList = [];
     let shuttle = getShuttleById(e.id)
     document.getElementById("rowId").value = shuttle._id
     document.getElementById("deviceId").value = shuttle.deviceId
@@ -283,9 +258,15 @@ function editShuttle(e){
     document.getElementById("shuttleRoute").value = shuttle.shuttleRoute
     document.getElementById("addBtn").style.display = 'none'
     document.getElementById("updateBtn").style.display = 'block'
+    try{
+        routesList = [...shuttle.route]
+    }
+    catch(e){}
+    updateList()
 }
 
 function addShuttleClick(){
+    routesList = [];
     document.getElementById("rowId").value = ""
     document.getElementById("shuttleNumber").value = ""
     document.getElementById("shuttleRoute").value = ""
@@ -306,9 +287,7 @@ function setShuttlesTable(shuttles) {
     shuttles.forEach((shuttle, i) => {
 
         row += `<tr><td>${shuttle.deviceId}</td>
-        <td>${shuttle.shuttleNumber}</td>
-      <td>${shuttle.routeNumber}</td>
-      <td>${shuttle.shuttleNumber}</td>`;
+        <td>${shuttle.shuttleNumber}</td>`;
       
         row += `<td><button type="button" id="${shuttle._id}" onclick="locateShuttle(this)" class="btn btn-outline-info mb-1 mr-1"><i class="fas fa-search"></i></button></td><td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
 

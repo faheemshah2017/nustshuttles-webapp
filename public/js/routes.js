@@ -135,6 +135,12 @@ function cancelRoute() {
 }
 
 function addRoute() {
+    document.getElementById("rowId").value = ""
+    document.getElementById("routeTitle").value = ""
+    document.getElementById("routeNumber").value = ""
+    document.getElementById("pathNumber").value = ""
+    document.getElementById("addBtn").style.display = 'block'
+    document.getElementById("updateBtn").style.display = 'none'
     $("#saveRouteBtn").css("display", "block");
     $("#cancelRouteBtn").css("display", "block");
     $("#addRouteBtn").css("display", "none");
@@ -223,6 +229,50 @@ function submitRoute() {
                     url: "/routes/get",
                     contentType: 'application/json',
                     type: 'GET',
+                    success: function (newRoutes) {
+                        routes = newRoutes;
+                        setRoutesTable(routes);
+                        cancelRoute();
+                    }
+                });
+            });
+        }
+    });
+}
+
+function updateRoute() {
+    var values = {};
+    $.each($('#data_form').serializeArray(), function (i, field) {
+        values[field.name] = field.value;
+    });
+
+    let id  = values.rowId
+    delete values.rowId;
+
+    $.ajax({
+        url: "/routes/update/"+id,
+        data: JSON.stringify(values),
+        cache: false,
+        processData: false,
+        contentType: 'application/json',
+        type: 'POST',
+        success: function (dataofconfirm) {
+            $('#addRouteModal').modal('hide');
+            $('.modal-backdrop').remove();
+
+            $('form#data_form').trigger("reset");
+
+            swal({
+                type: "success",
+                icon: "success",
+                title: "Route Updated",
+                showConfirmButton: !1,
+                timer: 3000
+            }).then(function () {
+                $.ajax({
+                    url: "/routes/get",
+                    contentType: 'application/json',
+                    type: 'GET',
                     success: function (routes) {
                         setRoutesTable(routes);
                         cancelRoute();
@@ -242,17 +292,30 @@ function setRoutesTable(routes) {
 
     routes.forEach((route, i) => {
 
-        row += `<tr><td>${route.routeNumber}</td>
-      <td>${route.pathNumber}</td>
-      <td>${route.timeFrom}</td>
-      <td>${route.timeTo}</td>`;
-        row += `<td><button type="button" id="${route._id}" onclick="editRoute(this)"  data-toggle="modal" data-target="#editRouteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${route._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
+        row += `<tr><td>${route.routeTitle}</td><td>${route.routeNumber}</td>
+      <td>${route.pathNumber}</td>`;
+        row += `<td><button type="button" id="${route._id}" onclick="editRoute(this)"  data-toggle="modal" data-target="#addRouteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${route._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
 
         row += "</tr>"
 
     });
     $("#table").append(row);
 
+}
+
+function editRoute(e){
+    let route = getRouteById(e.id)
+    document.getElementById("rowId").value = route._id
+    document.getElementById("routeTitle").value = route.routeTitle
+    document.getElementById("routeNumber").value = route.routeNumber
+    document.getElementById("pathNumber").value = route.pathNumber
+    document.getElementById("addBtn").style.display = 'none'
+    document.getElementById("updateBtn").style.display = 'block'
+}
+
+function getRouteById(id){
+    console.log(routes)
+    return (routes.filter(s=>s._id==id))[0]
 }
 
 function confirmDelete(route) {

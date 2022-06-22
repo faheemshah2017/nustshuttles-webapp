@@ -33,10 +33,9 @@
                         <table class="table align-items-center table-flush table-hover" id="dataTableHover">
                           <thead class="thead-light">
                             <tr>
+                              <th>Route Title</th>
                               <th>Route Number</th>
                               <th>Path Number</th>
-                              <th>Time From</th>
-                              <th>Time To</th>
                               <th>Action</th>
                             </tr>
                           </thead>
@@ -85,6 +84,12 @@
                       </div>
                       <div class="modal-body">
                         <form id="data_form">
+                          <input id="rowId" name="rowId" style="display: none;">
+                          <div class="form-group">
+                            <label>Route Title</label>
+                            <input type="text" class="form-control" required name="routeTitle" id="routeTitle"
+                              placeholder="Enter Route Title">
+                          </div>
                           <div class="form-group">
                             <label>Route Number</label>
                             <input type="number" class="form-control" required name="routeNumber" id="routeNumber"
@@ -95,19 +100,20 @@
                             <input type="number" class="form-control" required name="pathNumber" id="pathNumber"
                               placeholder="Enter Path Number">
                           </div>
-                          <div class="form-group">
+                          <!-- <div class="form-group">
                             <label>Time From</label>
                             <input type="time" class="form-control" required name="timeFrom" id="timeFrom">
                           </div>
                           <div class="form-group">
                             <label>Time To</label>
                             <input type="time" class="form-control" required name="timeTo" id="timeTo">
-                          </div>
+                          </div> -->
                         </form>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" onclick="submitRoute()">Add</button>
+                        <button type="submit" class="btn btn-primary" id="addBtn" onclick="submitRoute()">Add</button>
+                        <button type="submit" class="btn btn-primary" id="updateBtn" onclick="updateRoute()">Update</button>
                       </div>
                     </div>
                   </div>

@@ -19,6 +19,12 @@ router.post('/add',saveLogs("Added Route"), function (req, res, next) {
     })
 });
 
+router.post('/update/:id',saveLogs("Updated Route"), function (req, res, next) {
+    data_model.update(col_routes, req.params.id, req.body, (resp) => {
+      res.send(resp)
+    })
+});
+
 router.get('/get', function (req, res, next) {
     data_model.getAll(col_routes, (resp) => {
         res.send(resp)

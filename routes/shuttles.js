@@ -24,7 +24,14 @@ router.get('/get', function (req, res, next) {
 });
 
 router.post('/add', function (req, res, next) {
-  data_model.add(col_shuttles, req.body, (resp) => {
+  data_model.add(col_shuttles, req.body,async (resp) => {
+    try{
+      const child = ref.child(req.body.deviceId)
+      await child.update(req.body);
+    }
+    catch(e){
+      console.log(e)
+    }
     res.send(resp)
   })
 });
@@ -36,7 +43,14 @@ router.delete('/delete/:id', function (req, res, next) {
 });
 
 router.post('/update/:id', function (req, res, next) {
-  data_model.update(col_shuttles, req.params.id, req.body, (resp) => {
+  data_model.update(col_shuttles, req.params.id, req.body,async (resp) => {
+    try{
+      const child = ref.child(req.body.deviceId)
+      await child.update(req.body);
+    }
+    catch(e){
+      console.log(e)
+    }
     res.send(resp)
   })
 });
@@ -60,23 +74,23 @@ router.post('/sendLocation', (req, res, next) => {
     console.log(req.body.deviceId)
     data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
       console.log("shuttle",shuttle)
-      let data = {
-        deviceId:req.body.deviceId,
-        busNumber:shuttle.shuttleNumber,
-        latitude:req.body.latitude,
-        logitude:req.body.longitude,
-        speed:req.body.speed,
-        time:req.body.time
-      }
-      if(shuttle){
-        try{
-          const child = ref.child(req.body.deviceId)
-          await child.update(data);
-        }
-        catch(e){
-          console.log(e)
-        }
-      }
+      // let data = {
+      //   deviceId:req.body.deviceId,
+      //   busNumber:shuttle.shuttleNumber,
+      //   latitude:req.body.latitude,
+      //   logitude:req.body.longitude,
+      //   speed:req.body.speed,
+      //   time:req.body.time
+      // }
+      // if(shuttle){
+      //   try{
+      //     const child = ref.child(req.body.deviceId)
+      //     await child.update(data);
+      //   }
+      //   catch(e){
+      //     console.log(e)
+      //   }
+      // }
       delete req.body._id;
       data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
         res.send(resp)
