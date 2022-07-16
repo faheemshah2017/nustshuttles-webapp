@@ -51,7 +51,7 @@
                     <select type="text" class="btn btn-primary mb-1" onchange="changeRoute(event)">
                       <option style="background:white;color:black">Select Route</option>
                       <% routes.forEach(route=> {%>
-                        <option style="background:white;color:black" value="<%=route._id%>">Route#<%=route.routeNumber%>
+                        <option style="background:white;color:black" value="<%=route._id%>"><%=route.routeTitle%>
                             -<%=route.pathNumber%>
                         </option>
                         <% }); %>

@@ -73,6 +73,12 @@ router.post('/shuttleLocation', function (req, res, next) {
   })
 });
 
+router.get('/shuttleData/:id', function (req, res, next) {
+  data_model.getAllDataBy(col_shuttlesData,"deviceId", req.params.id, (resp) => {
+    res.send(resp)
+  })
+});
+
 router.get('/shuttleLocation', function (req, res, next) {
   data_model.getAll(col_shuttles, (resp) => {
     res.send(resp)

@@ -70,27 +70,36 @@ router.get('/location', function (req, res, next) {
 
 router.post('/sendLocation', (req, res, next) => {
   console.log(req.body)
-  data_model.add(col_shuttlesData, req.body, (resp) => {
+  
+  let shuttleData = {
+    deviceId:req.body.deviceId,
+    busNumber:shuttle.shuttleNumber,
+    latitude:parseFloat(req.body.latitude),
+    longitude:parseFloat(req.body.longitude),
+    speed:parseInt(req.body.speed),
+    time:parseInt(req.body.time)
+  }
+  data_model.add(col_shuttlesData, shuttleData, (resp) => {
     console.log(req.body.deviceId)
     data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
       console.log("shuttle",shuttle)
-      // let data = {
-      //   deviceId:req.body.deviceId,
-      //   busNumber:shuttle.shuttleNumber,
-      //   latitude:req.body.latitude,
-      //   logitude:req.body.longitude,
-      //   speed:req.body.speed,
-      //   time:req.body.time
-      // }
-      // if(shuttle){
-      //   try{
-      //     const child = ref.child(req.body.deviceId)
-      //     await child.update(data);
-      //   }
-      //   catch(e){
-      //     console.log(e)
-      //   }
-      // }
+      let data = {
+        deviceId:req.body.deviceId,
+        busNumber:shuttle.shuttleNumber,
+        latitude:req.body.latitude,
+        logitude:req.body.longitude,
+        speed:req.body.speed,
+        time:req.body.time
+      }
+      if(shuttle){
+        try{
+          const child = ref.child(req.body.deviceId)
+          await child.update(data);
+        }
+        catch(e){
+          console.log(e)
+        }
+      }
       delete req.body._id;
       data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
         res.send(resp)

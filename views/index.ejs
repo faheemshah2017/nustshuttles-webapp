@@ -363,6 +363,16 @@
 
     shuttles = <%- JSON.stringify(shuttles); %>;
     tracking = <%- JSON.stringify(tracking); %>;
+
+    $.ajax({
+                    url: "/shuttleData/1207894648",
+                    contentType: 'application/json',
+                    type: 'GET',
+                    success: function (res) {
+                      debugger
+                    }
+                });
+
     console.log(tracking)
     function initMap() {
       // map = new google.maps.Map(document.getElementById("map"), {
