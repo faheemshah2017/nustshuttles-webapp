@@ -73,12 +73,13 @@ router.post('/sendLocation', (req, res, next) => {
   
   let shuttleData = {
     deviceId:req.body.deviceId,
-    busNumber:shuttle.shuttleNumber,
     latitude:parseFloat(req.body.latitude),
     longitude:parseFloat(req.body.longitude),
     speed:parseInt(req.body.speed),
-    time:parseInt(req.body.time)
-  }
+    time:parseInt(req.body.time),
+    datetime:new Date(parseInt(req.body.time)*1000).toISOString()
+  }  
+
   data_model.add(col_shuttlesData, shuttleData, (resp) => {
     console.log(req.body.deviceId)
     data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {

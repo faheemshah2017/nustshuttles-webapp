@@ -58,6 +58,8 @@ function initMap() {
         newRoute.pop()
         let flightPlanCoordinates = newRoute;
 
+        console.log(marker)
+
         i++;
         flightPath[i] = new google.maps.Polyline({
             path: flightPlanCoordinates,
@@ -68,6 +70,7 @@ function initMap() {
         });
         try {
             flightPath[lastRoute].setMap(null);
+            marker[lastRoute].setMap(null);
         }
         catch (e) { }
         flightPath[i].setMap(map);
@@ -89,6 +92,20 @@ function initMap() {
                 strokeColor: "#224879",
                 strokeOpacity: 1.0,
                 strokeWeight: 2,
+            });
+            
+            marker[i] = new google.maps.Marker({
+                map: map,
+                position: mapsMouseEvent.latLng.toJSON(),
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#224879',
+                    fillOpacity: 1,
+                    strokeColor: '#224879',
+                    strokeOpacity: 1,
+                    strokeWeight: 1,
+                    scale: 5
+                }
             });
             try {
                 flightPath[lastRoute].setMap(null);
@@ -176,6 +193,7 @@ function showLabels() {
 }
 
 const flightPath = []
+const marker = []
 var lastRoute = 0;
 function changeRoute(e) {
     selectRoute(e.target.value)
@@ -189,6 +207,21 @@ function selectRoute(routeID) {
         strokeOpacity: 1.0,
         strokeWeight: 2,
     });
+    // flightPlanCoordinates.forEach(point=>{
+    //     new google.maps.Marker({
+    //         map: map,
+    //         position: point,
+    //         icon: {
+    //             path: google.maps.SymbolPath.CIRCLE,
+    //             fillColor: '#224879',
+    //             fillOpacity: 1,
+    //             strokeColor: '#224879',
+    //             strokeOpacity: 1,
+    //             strokeWeight: 1,
+    //             scale: 5
+    //         }
+    //     });
+    // })
     try {
         flightPath[lastRoute].setMap(null);
     }
