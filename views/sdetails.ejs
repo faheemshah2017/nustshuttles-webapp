@@ -1,0 +1,290 @@
+<%- include('./partials/header') %>
+
+  <body id="page-top">
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <%- include('./partials/sidebar') %>
+        <!-- Sidebar -->
+        <div id="content-wrapper" class="d-flex flex-column">
+          <div id="content">
+            <!-- TopBar -->
+            <%- include('./partials/topbar') %>
+              <!-- Topbar -->
+
+              <!-- Container Fluid-->
+              <div class="container-fluid" id="container-wrapper">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                  <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="./">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                  </ol>
+                </div>
+                <div class="row mb-3">
+                  <!-- Earnings (Monthly) Card Example -->
+                  <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Top Speed (Monthly)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=top_speed%> kph</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <!-- <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span> -->
+                              <!-- <span>Shuttle#<%=top_speed_bus%></span> -->
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-fw fa-tachometer-alt fa-2x text-primary"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Pending Requests Card Example -->
+                  <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Avg Speed (Monthly)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=avg_speed%> kph</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <!-- <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span> -->
+                              <!-- <span>All Shuttles Today</span> -->
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-bus fa-2x text-warning"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Earnings (Annual) Card Example -->
+                  <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Mileage (Monthly)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=totalDistance%> km</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span> -->
+                              <!-- <span>All Shuttles Today</span> -->
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-road fa-2x text-success"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- New User Card Example -->
+                  <!-- <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Active Users</div>
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">366</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 20.4%</span>
+                              <span>Since last month</span>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-info"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                  <div class="col-xl-8 col-lg-7">
+                    <div class="card mb-4">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Avg & Top Speed</h6>
+                        <div class="dropdown no-arrow">
+                          <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <div id="avg-top-speed"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Pie Chart -->
+                  <div class="col-xl-4 col-lg-5">
+                    <div class="card mb-4"style="height: 95.5%;">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Shuttles Mileage</h6>
+                        <div class="dropdown no-arrow">
+                          <!-- <a class="dropdown-toggle btn btn-primary btn-sm" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Month <i class="fas fa-chevron-down"></i>
+                          </a> -->
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Select Periode</div>
+                            <a class="dropdown-item" href="#">Today</a>
+                            <a class="dropdown-item" href="#">Week</a>
+                            <a class="dropdown-item active" href="#">Month</a>
+                            <a class="dropdown-item" href="#">This Year</a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body" id="top-speed">
+                      </div>
+                      <div class="card-footer text-center">
+                        <a class="m-0 small text-primary card-link" href="#">View More <i
+                            class="fas fa-chevron-right"></i></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--Row-->
+
+                <!-- Modal Logout -->
+                <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+                  aria-labelledby="exampleModalLabelLogout" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabelLogout">Ohh No!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to logout?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+                        <a href="/users/logout" class="btn btn-primary">Logout</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!---Container Fluid-->
+          </div>
+          <!-- Footer -->
+          <%- include('./partials/footer') %>
+            <!-- Footer -->
+        </div>
+    </div>
+
+    <!-- Scroll to top -->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <%- include('./partials/plugins') %>
+  </body>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+  <script>
+  allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;
+  dDistance = <%- JSON.stringify(dDistance); %>;
+  
+let allshuttles = [];
+let dataSeriesAvgTop = [
+  {
+    name: "Avg",
+    data: [],
+  },
+  {
+    name: "Top",
+    data: [],
+  },
+];
+
+allShuttlesSum.sort((a, b) =>
+  a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
+);
+
+colors = ['bg-warning','bg-danger','bg-success','bg-info','bg-warning','bg-success']
+
+speeds = '';
+allShuttlesSum.forEach((s) => {
+  allshuttles.push("Shuttle#" + s._id.shuttleNumber);
+  dataSeriesAvgTop[0].data.push(s.avg_speed);
+  dataSeriesAvgTop[1].data.push(s.top_speed);
+  i = Math.floor((Math.random() * 5) + 1)
+  let dd = dDistance[s._id.device]
+  dd=dd??0;
+    speeds += `
+    <div class="mb-3">
+      <div class="small text-gray-500">Shuttle#${s._id.shuttleNumber}
+        <div class="small float-right"><b>${dd} km</b></div>
+      </div>
+      <div class="progress" style="height: 12px;">
+        <div class="progress-bar ${colors[i]}" role="progressbar" style="width: ${dd/2}%"
+          aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>`
+});
+$(document).ready(function () {
+  $("#top-speed").append(speeds);
+});
+
+Highcharts.chart("avg-top-speed", {
+  chart: {
+    type: "column",
+  },
+  title: {
+    text: "",
+  },
+  // subtitle: {
+  //     text: 'All Shuttles'
+  // },
+  xAxis: {
+    categories: allshuttles,
+    crosshair: true,
+  },
+  yAxis: {
+    min: 0,
+    title: {
+      text: "Speed (kph)",
+    },
+  },
+  tooltip: {
+    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+    pointFormat:
+      '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+      '<td style="padding:0"><b>{point.y:.1f} kph</b></td></tr>',
+    footerFormat: "</table>",
+    shared: true,
+    useHTML: true,
+  },
+  plotOptions: {
+    column: {
+      pointPadding: 0.2,
+      borderWidth: 0,
+    },
+  },
+  credits: {
+    enabled: false,
+  },
+  series: dataSeriesAvgTop,
+});
+  
+  </script>
+  </html>

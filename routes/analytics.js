@@ -47,6 +47,60 @@ router.get("/", authUser, function (req, res, next) {
   });
 });
 
+router.get("/:id", authUser, function (req, res, next) {
+  data_model.getlatlngByDate(col_shuttlesData, getCurrentDate(), (d) => {
+    const groupByDevice = d.reduce((group, data) => {
+      const { deviceId } = data;
+      group[deviceId] = group[deviceId] ?? [];
+      group[deviceId].push(data);
+      return group;
+    }, {});
+
+    let devices = Object.keys(groupByDevice);
+    let totalDistance = 0;
+    let deviceDistance = {}
+    if (devices.length > 1) {
+      devices.forEach((d) => {
+        let deviceArray = groupByDevice[d];
+        let distance = calculateTotalDistance(deviceArray);
+        totalDistance += distance;
+        deviceDistance[deviceArray[0].deviceId] = Math.round(distance)
+      });
+    }
+    console.log(deviceDistance)
+    data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
+      let avg_speed = 0;
+      let top_speed = 0;
+      let top_speed_bus = "";
+      r.forEach((e) => {
+        avg_speed += e.avg_speed;
+        if (e.top_speed > top_speed) {
+          top_speed = e.top_speed;
+          top_speed_bus = e._id.shuttleNumber;
+        }
+      });
+      avg_speed = parseInt(avg_speed / r.length);
+
+      data_model.getAll(col_tracking, (tracking) => {
+        data = {
+          page: "analytics",
+          title: req.params.id+" | Analytics",
+          plugins: [],
+          tracking: tracking,
+          user: req.user,
+          avg_speed: avg_speed,
+          top_speed: top_speed,
+          top_speed_bus: top_speed_bus,
+          allShuttlesSum: r,
+          dDistance:deviceDistance,
+          totalDistance: parseInt(totalDistance),
+        };
+        res.render("sdetails", data);
+      });
+    });
+  });
+});
+
 function distance(lat1, lat2, lon1, lon2) {
   // The math module contains a function
   // named toRadians which converts from
