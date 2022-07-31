@@ -10,15 +10,48 @@
         <img src="img/logo/logo.png">
       </div>
     </a>
-    <hr class="sidebar-divider my-0">
-    <li class="nav-item active">
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+      Live Tracking
+    </div>
+    <li class="nav-item <% if(page=='dashboard'){ %>nav-active<% } %>">
       <a class="nav-link" href="/">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Dashboard</span></a>
     </li>
+    <li class="nav-item <% if(page=='map'){ %>nav-active<% } %>">
+      <a class="nav-link" href="/map">
+        <i class="fas fa-fw fa-globe"></i>
+        <span>Map</span></a>
+    </li>
     <hr class="sidebar-divider">
     <div class="sidebar-heading">
-      Live Tracking
+      Analytics
+    </div>
+    <!-- <li class="nav-item">
+      <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePage" aria-expanded="true"
+        aria-controls="collapsePage">
+        <i class="fas fa-fw fa-columns"></i>
+        <span>Trips</span>
+      </a>
+      <div id="collapsePage" class="collapse" aria-labelledby="headingPage" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+          <h6 class="collapse-header">All Trips</h6>
+          <a class="collapse-item" href="/">6 Dec 07:09 - 07:57am</a>
+          <a class="collapse-item" href="/">7 Dec 12:00 - 12:33am</a>
+          <a class="collapse-item" href="/">8 Dec 08:15 - 09:05am</a>
+        </div>
+      </div>
+    </li> -->
+    <li class="nav-item <% if(page=='analytics'){ %>nav-active<% } %>">
+      <a class="nav-link" href="/analytics">
+        <i class="fas fa-fw fa-chart-area"></i>
+        <span>Reports</span>
+      </a>
+    </li>
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+      Settings
     </div>
     <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="/shuttles" data-toggle="collapse" data-target="#collapseBootstrap"
@@ -51,31 +84,6 @@
       <a class="nav-link" href="/routes">
         <i class="fas fa-fw fa-road"></i>
         <span>Routes</span>
-      </a>
-    </li>
-    <hr class="sidebar-divider">
-    <div class="sidebar-heading">
-      History
-    </div>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePage" aria-expanded="true"
-        aria-controls="collapsePage">
-        <i class="fas fa-fw fa-columns"></i>
-        <span>Trips</span>
-      </a>
-      <div id="collapsePage" class="collapse" aria-labelledby="headingPage" data-parent="#accordionSidebar">
-        <div class="bg-white py-2 collapse-inner rounded">
-          <h6 class="collapse-header">All Trips</h6>
-          <a class="collapse-item" href="/">6 Dec 07:09 - 07:57am</a>
-          <a class="collapse-item" href="/">7 Dec 12:00 - 12:33am</a>
-          <a class="collapse-item" href="/">8 Dec 08:15 - 09:05am</a>
-        </div>
-      </div>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/">
-        <i class="fas fa-fw fa-chart-area"></i>
-        <span>Reports</span>
       </a>
     </li>
     <hr class="sidebar-divider">

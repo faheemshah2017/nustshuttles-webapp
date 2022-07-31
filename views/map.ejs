@@ -1,0 +1,160 @@
+<%- include('./partials/header') %>
+
+  <body id="page-top">
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <%- include('./partials/sidebar') %>
+        <!-- Sidebar -->
+        <div id="content-wrapper" class="d-flex flex-column">
+          <div id="content">
+            <!-- TopBar -->
+            <%- include('./partials/topbar') %>
+              <!-- Topbar -->
+
+              <!-- Container Fluid-->
+              <div class="container-fluid" id="container-wrapper">
+                <div class="row mb-3">
+                  <div class="col-lg-12">
+                    <div id="map" style="height:880px;"></div>
+                  </div>
+                </div>
+                <!--Row-->
+
+                <!-- Modal Logout -->
+                <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+                  aria-labelledby="exampleModalLabelLogout" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabelLogout">Ohh No!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to logout?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+                        <a href="/users/logout" class="btn btn-primary">Logout</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!---Container Fluid-->
+          </div>
+          <!-- Footer -->
+          <%- include('./partials/footer') %>
+            <!-- Footer -->
+        </div>
+    </div>
+
+    <!-- Scroll to top -->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <%- include('./partials/plugins') %>
+  </body>
+
+  <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpx_pUdrVXPkpH8d36RDyvIY1HrEA082E &callback=initMap&libraries=&v=weekly"
+    async></script>
+  <script>
+    let map;
+    tracking = <%- JSON.stringify(tracking); %>;
+
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 33.643418, lng: 72.990158 },
+        zoom: 16,        
+        restriction: {
+          latLngBounds: {
+            north: 36,
+            south: 24,
+            east: 77,
+            west: 65
+          }
+        },
+        heading: -32.5,
+        mapId: "90f87356969d889c",
+      }, () => {
+        document.getElementById("map").style.height = "1000px"
+      });
+
+      // Pick your pin (hole or no hole)
+      var pinSVGHole = "M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z";
+      var labelOriginHole = new google.maps.Point(12, 15);
+      var pinSVGFilled = "M 12,2 C 8.1340068,2 5,5.1340068 5,9 c 0,5.25 7,13 7,13 0,0 7,-7.75 7,-13 0,-3.8659932 -3.134007,-7 -7,-7 z";
+      var labelOriginFilled = new google.maps.Point(12, 9);
+
+      fillColor = {
+        0: "#66bb6a",
+        1: "#fc544b",
+        2: "#ffa426"
+      }
+
+      images = {
+        0: "ok",
+        1: "alert",
+        2: "fault"
+      }
+
+      images2 = {
+        0: "offline",
+        1: "online",
+      }
+
+      strokeColor = {
+        0: "#eaecf4",
+        1: "#66bb6a"
+      }
+
+      devices = []
+      const markers = tracking.map((shuttle, i) => {
+        if (parseFloat(shuttle.speed) > 5) {
+          shuttle.status = "active"
+        }
+        if (parseFloat(shuttle.speed) < 5 && parseFloat(shuttle.speed) > 0) {
+          shuttle.status = "idle"
+        }
+        if (parseFloat(shuttle.speed) == 0) {
+          shuttle.status = "stop"
+        }
+        return new google.maps.Marker({
+          position: { lat: parseFloat(shuttle.latitude), lng: parseFloat(shuttle.longitude) },
+          icon: {
+            url: `/img/${shuttle.status}.png`, // url
+            scaledSize: new google.maps.Size(50, 50), // scaled size
+          },
+          title: "Shuttle# " + shuttle.deviceId
+        });
+      });
+      new MarkerClusterer(map, markers, {
+        imagePath:
+          "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      });
+
+      const flightPlanCoordinates = [
+        {
+          lat: 33.64904,
+          lng: 72.999501
+        }, {
+          lat: 33.647451,
+          lng: 72.996379
+        }, {
+          lat: 33.645861,
+          lng: 72.993357
+        }, {
+          lat: 33.645724,
+          lng: 72.993108
+        }
+      ];
+    };
+
+  </script>
+  </html>

@@ -7,7 +7,7 @@ router.get('/', function (req, res, next) {
       data = {
         page: 'shuttles',
         title: 'Nust Shuttles',
-        plugins: ['charts'],
+        plugins: [],
         shuttles: shuttles,
         user: req.user,
         routes: routes
@@ -69,7 +69,6 @@ router.get('/location', function (req, res, next) {
 });
 
 router.post('/sendLocation', (req, res, next) => {
-  console.log(req.body)
   
   let shuttleData = {
     deviceId:req.body.deviceId,
@@ -77,13 +76,15 @@ router.post('/sendLocation', (req, res, next) => {
     longitude:parseFloat(req.body.longitude),
     speed:parseInt(req.body.speed),
     time:parseInt(req.body.time),
-    datetime:new Date(parseInt(req.body.time)*1000).toISOString()
+    location:{
+      type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
+    },
+    datetime:new Date(parseInt(req.body.time)*1000)
   }  
+  console.log(shuttleData)
 
   data_model.add(col_shuttlesData, shuttleData, (resp) => {
-    console.log(req.body.deviceId)
     data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
-      console.log("shuttle",shuttle)
       let data = {
         deviceId:req.body.deviceId,
         busNumber:shuttle.shuttleNumber,

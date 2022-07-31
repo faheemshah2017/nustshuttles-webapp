@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var shuttlesRouter = require('./routes/shuttles');
 var routesRouter = require('./routes/routes');
+var analyticsRouter = require('./routes/analytics');
 
 passport = require('passport');
 session = require('express-session');
@@ -146,6 +147,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/shuttles', shuttlesRouter);
 app.use('/routes', routesRouter);
+app.use('/analytics', analyticsRouter);
 
 // error handler
 app.use(function(err, req, res, next) {
