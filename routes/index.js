@@ -77,12 +77,16 @@ router.get("/", authUser, function (req, res, next) {
 
     let devices = Object.keys(groupByDevice);
     let totalDistance = 0;
+    let deviceDistance = {}
     if (devices.length > 1) {
       devices.forEach((d) => {
         let deviceArray = groupByDevice[d];
-        totalDistance += calculateTotalDistance(deviceArray);
+        let distance = calculateTotalDistance(deviceArray);
+        totalDistance += distance;
+        deviceDistance[deviceArray[0].deviceId] = Math.round(distance)
       });
     }
+    console.log(deviceDistance)
     data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
       let avg_speed = 0;
       let top_speed = 0;
@@ -107,6 +111,7 @@ router.get("/", authUser, function (req, res, next) {
           top_speed: top_speed,
           top_speed_bus: top_speed_bus,
           allShuttlesSum: r,
+          dDistance:deviceDistance,
           totalDistance: parseInt(totalDistance),
         };
         res.render("index", data);
@@ -287,5 +292,6 @@ function getCurrentDate() {
   let month = date.getMonth() + 1;
   let year = date.getFullYear();
   return `${year}-${month}-${day}`;
+  // return '2022-07-31'
 }
 module.exports = router;
