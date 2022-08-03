@@ -241,7 +241,7 @@ var data_model = {
   //     return callback(result);
   //   });
   // },
-  
+
   getSummary: function (collection, date, callback) {
     const agg = [
       {
@@ -262,16 +262,16 @@ var data_model = {
           deviceId: 1,
           speed: 1,
           shuttleNumber: "$result.shuttleNumber",
-          datetime:"$datetime"
+          datetime: "$datetime",
         },
       },
       {
         $match: {
-          datetime:{
+          datetime: {
             $gte: new Date(date),
           },
           speed: {
-            $gte: 0,
+            $gt: 2,
           },
         },
       },
@@ -279,7 +279,7 @@ var data_model = {
         $group: {
           _id: {
             device: "$deviceId",
-            shuttleNumber: "$shuttleNumber"
+            shuttleNumber: "$shuttleNumber",
           },
           avg_speed: {
             $avg: "$speed",
@@ -296,7 +296,7 @@ var data_model = {
       return callback(result);
     });
   },
-  getDataByDate: function (collection,date, callback) {
+  getDataByDate: function (collection, date, callback) {
     const agg = [
       {
         $lookup: {
@@ -351,6 +351,154 @@ var data_model = {
       },
     };
     collection.find(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
+  shuttlelatlngByDate: function (collection, deviceId, date, callback) {
+    const query = {
+      deviceId: deviceId,
+      datetime: {
+        $gte: new Date(date),
+      },
+      speed: {
+        $gt: 0,
+      },
+    };
+    collection.find(query).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
+  shuttlelatlngByMonth: function (collection, deviceId, year, month, callback) {
+    const agg = [
+      {
+        $project: {
+          deviceId: 1,
+          latitude: 1,
+          longitude: 1,
+          speed: 1,
+          datetime: "$datetime",
+          year: {
+            $year: "$datetime",
+          },
+          month: {
+            $month: "$datetime",
+          },
+          day: {
+            $dayOfMonth: "$datetime",
+          },
+        },
+      },
+      {
+        $match: {
+          deviceId: deviceId,
+          year: year,
+          month: month,
+          speed: {
+            $gt: 2,
+          },
+        },
+      },
+    ];
+    // const query = {
+    //   deviceId: deviceId,
+    //   datetime: {
+    //     $gte: new Date(date),
+    //   },
+    //   speed: {
+    //     $gt: 0,
+    //   },
+    // };
+    collection.aggregate(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
+  getDeviceSummaryDaily: function (collection, deviceId, date, callback) {
+    const agg = [
+      {
+        $project: {
+          deviceId: 1,
+          speed: 1,
+          datetime: "$datetime",
+        },
+      },
+      {
+        $match: {
+          deviceId: deviceId,
+          datetime: {
+            $gte: new Date(date),
+          },
+          speed: {
+            $gt: 2,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            device: "$deviceId",
+          },
+          avg_speed: {
+            $avg: "$speed",
+          },
+          top_speed: {
+            $max: "$speed",
+          },
+        },
+      },
+    ];
+
+    collection.aggregate(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result[0]);
+    });
+  },
+  getDeviceSummaryMonthly: function (collection,deviceId,year,month,callback) {
+    const agg = [
+      {
+        $project: {
+          deviceId: 1,
+          speed: 1,
+          datetime: "$datetime",
+          year: {
+            $year: "$datetime",
+          },
+          month: {
+            $month: "$datetime",
+          },
+          day: {
+            $dayOfMonth: "$datetime",
+          },
+        },
+      },
+      {
+        $match: {
+          deviceId: deviceId,
+          year: year,
+          month: month,
+          speed: {
+            $gt: 2,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            day: "$day",
+          },
+          avg_speed: {
+            $avg: "$speed",
+          },
+          top_speed: {
+            $max: "$speed",
+          },
+        },
+      },
+    ];
+
+    collection.aggregate(agg).toArray(function (err, result) {
       if (err) throw err;
       return callback(result);
     });

@@ -14,11 +14,7 @@
               <!-- Container Fluid-->
               <div class="container-fluid" id="container-wrapper">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                  <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="./">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                  </ol>
+                  <h1 class="h3 mb-0 text-gray-800">Shuttle#<%=shuttle%></h1>
                 </div>
                 <div class="row mb-3">
                   <!-- Earnings (Monthly) Card Example -->
@@ -202,8 +198,7 @@
 
   <script>
   allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;
-  dDistance = <%- JSON.stringify(dDistance); %>;
-  
+  dailyDistance = <%- JSON.stringify(dailyDistance); %>;
 let allshuttles = [];
 let dataSeriesAvgTop = [
   {
@@ -216,23 +211,23 @@ let dataSeriesAvgTop = [
   },
 ];
 
-allShuttlesSum.sort((a, b) =>
-  a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
-);
+// allShuttlesSum.sort((a, b) =>
+//   a._id.day.localeCompare(b._id.day)
+// );
 
 colors = ['bg-warning','bg-danger','bg-success','bg-info','bg-warning','bg-success']
 
 speeds = '';
 allShuttlesSum.forEach((s) => {
-  allshuttles.push("Shuttle#" + s._id.shuttleNumber);
+  allshuttles.push("Day#" + s._id.day);
   dataSeriesAvgTop[0].data.push(s.avg_speed);
   dataSeriesAvgTop[1].data.push(s.top_speed);
   i = Math.floor((Math.random() * 5) + 1)
-  let dd = dDistance[s._id.device]
+  let dd = dailyDistance[s._id.day]
   dd=dd??0;
     speeds += `
     <div class="mb-3">
-      <div class="small text-gray-500">Shuttle#${s._id.shuttleNumber}
+      <div class="small text-gray-500">Day#${s._id.day}
         <div class="small float-right"><b>${dd} km</b></div>
       </div>
       <div class="progress" style="height: 12px;">

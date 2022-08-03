@@ -47,28 +47,26 @@ router.get("/", authUser, function (req, res, next) {
   });
 });
 
-router.get("/:id", authUser, function (req, res, next) {
-  data_model.getlatlngByDate(col_shuttlesData, getCurrentDate(), (d) => {
-    const groupByDevice = d.reduce((group, data) => {
-      const { deviceId } = data;
-      group[deviceId] = group[deviceId] ?? [];
-      group[deviceId].push(data);
-      return group;
-    }, {});
-
-    let devices = Object.keys(groupByDevice);
-    let totalDistance = 0;
-    let deviceDistance = {}
-    if (devices.length > 1) {
-      devices.forEach((d) => {
-        let deviceArray = groupByDevice[d];
-        let distance = calculateTotalDistance(deviceArray);
-        totalDistance += distance;
-        deviceDistance[deviceArray[0].deviceId] = Math.round(distance)
-      });
-    }
-    console.log(deviceDistance)
-    data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
+router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
+  data_model.shuttlelatlngByMonth(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (d) => {
+    data_model.getDeviceSummaryMonthly(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (r) => {
+      const groupByDay = d.reduce((group, data) => {
+        const { day } = data;
+        group[day] = group[day] ?? [];
+        group[day].push(data);
+        return group;
+      }, {});
+      let days = Object.keys(groupByDay);
+      let totalDistance = 0;
+      let dailyDistance = {}
+      if (days.length > 1) {
+        days.forEach((d) => {
+          let daysArray = groupByDay[d];
+          let distance = calculateTotalDistance(daysArray);
+          totalDistance += distance;
+          dailyDistance[daysArray[0].day] = Math.round(distance)
+        });
+      }
       let avg_speed = 0;
       let top_speed = 0;
       let top_speed_bus = "";
@@ -79,24 +77,21 @@ router.get("/:id", authUser, function (req, res, next) {
           top_speed_bus = e._id.shuttleNumber;
         }
       });
-      avg_speed = parseInt(avg_speed / r.length);
-
-      data_model.getAll(col_tracking, (tracking) => {
+      avg_speed = Math.round(avg_speed / r.length);
         data = {
           page: "analytics",
-          title: req.params.id+" | Analytics",
+          title: "Shuttle#"+req.params.shuttlenumber+" | Analytics",
           plugins: [],
-          tracking: tracking,
           user: req.user,
           avg_speed: avg_speed,
           top_speed: top_speed,
-          top_speed_bus: top_speed_bus,
+          top_speed_bus: req.params.shuttlenumber,
           allShuttlesSum: r,
-          dDistance:deviceDistance,
-          totalDistance: parseInt(totalDistance),
+          shuttle:req.params.shuttlenumber,
+          totalDistance: Math.round(totalDistance),
+          dailyDistance: dailyDistance,
         };
         res.render("sdetails", data);
-      });
     });
   });
 });
@@ -148,5 +143,15 @@ function getCurrentDate() {
   let month = date.getMonth() + 1;
   let year = date.getFullYear();
   return `${year}-${month}-${day}`;
+}
+function getCurrentYear() {
+  const date = new Date();
+  let year = date.getFullYear();
+  return year;
+}
+function getCurrentMonth() {
+  const date = new Date();
+  let month = date.getMonth() + 1;
+  return month;
 }
 module.exports = router;
