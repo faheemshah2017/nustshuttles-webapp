@@ -197,9 +197,11 @@ router.delete('/delete', function(req, res, next) {
 });
 
 router.get('/logout', function(req, res) {
-    req.logout();
-    req.flash('info', 'You are logged out');
-    res.redirect('/login');
+    req.logout(function(err) {
+      if (err) { return next(err); }
+      req.flash('info', 'You are logged out');
+      res.redirect('/login');
+    });
 });
 
 // router.post('/auth', function(req, res, next) {
