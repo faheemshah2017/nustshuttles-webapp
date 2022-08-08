@@ -15,7 +15,7 @@ function setShuttlesTable(shuttles) {
         <td>${Math.round(shuttle.avg_speed)}</td>
         <td>${shuttle.top_speed}</td>`;
       
-        row += `<td><button type="button" id="${shuttle._id.device}" onclick="analyzeShuttle(${shuttle._id.device},${shuttle._id.shuttleNumber})"  class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-bus"></i></button>`;
+        row += `<td><button type="button" id="${shuttle._id.device}" onclick="analyzeShuttle(${shuttle._id.device},${shuttle._id.shuttleNumber})"  class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-fw fa-chart-area"></i></button>`;
 
         row += "</tr>"
 

@@ -15,6 +15,7 @@
               <div class="container-fluid" id="container-wrapper">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                   <h1 class="h3 mb-0 text-gray-800">Shuttle#<%=shuttle%></h1>
+                  <h1 class="h3 mb-0 text-gray-800 float-right" id="duration"><%=month%>-<%=year%></h1>
                 </div>
                 <div class="row mb-3">
                   <!-- Earnings (Monthly) Card Example -->
@@ -23,11 +24,11 @@
                       <div class="card-body">
                         <div class="row align-items-center">
                           <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Top Speed (Monthly)</div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Top Speed</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><%=top_speed%> kph</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span> -->
-                              <!-- <span>Shuttle#<%=top_speed_bus%></span> -->
+                              <span>This Month</span>
                             </div>
                           </div>
                           <div class="col-auto">
@@ -43,11 +44,11 @@
                       <div class="card-body">
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Avg Speed (Monthly)</div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Avg Speed</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><%=avg_speed%> kph</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span> -->
-                              <!-- <span>All Shuttles Today</span> -->
+                              <span>This Month</span>
                             </div>
                           </div>
                           <div class="col-auto">
@@ -63,11 +64,11 @@
                       <div class="card-body">
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Mileage (Monthly)</div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Mileage</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><%=totalDistance%> km</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span> -->
-                              <!-- <span>All Shuttles Today</span> -->
+                              <span>This Month</span>
                             </div>
                           </div>
                           <div class="col-auto">
@@ -101,7 +102,7 @@
                     <div class="card mb-4">
                       <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Avg & Top Speed</h6>
-                        <div class="dropdown no-arrow">
+                        <!-- <div class="dropdown no-arrow">
                           <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -114,7 +115,7 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#">Something else here</a>
                           </div>
-                        </div>
+                        </div> -->
                       </div>
                       <div class="card-body">
                         <div id="avg-top-speed"></div>
@@ -123,7 +124,7 @@
                   </div>
                   <!-- Pie Chart -->
                   <div class="col-xl-4 col-lg-5">
-                    <div class="card mb-4"style="height: 95.5%;">
+                    <div class="card mb-4" style="height: 491px;overflow: hidden;overflow-y: scroll">
                       <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Shuttles Mileage</h6>
                         <div class="dropdown no-arrow">
@@ -131,22 +132,22 @@
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Month <i class="fas fa-chevron-down"></i>
                           </a> -->
-                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                          <!-- <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                             aria-labelledby="dropdownMenuLink">
                             <div class="dropdown-header">Select Periode</div>
                             <a class="dropdown-item" href="#">Today</a>
                             <a class="dropdown-item" href="#">Week</a>
                             <a class="dropdown-item active" href="#">Month</a>
                             <a class="dropdown-item" href="#">This Year</a>
-                          </div>
+                          </div> -->
                         </div>
                       </div>
-                      <div class="card-body" id="top-speed">
+                      <div class="card-body" id="mileage">
                       </div>
-                      <div class="card-footer text-center">
+                      <!-- <div class="card-footer text-center">
                         <a class="m-0 small text-primary card-link" href="#">View More <i
                             class="fas fa-chevron-right"></i></a>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>
@@ -199,6 +200,7 @@
   <script>
   allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;
   dailyDistance = <%- JSON.stringify(dailyDistance); %>;
+  month = <%- JSON.stringify(month); %>;
 let allshuttles = [];
 let dataSeriesAvgTop = [
   {
@@ -215,11 +217,13 @@ let dataSeriesAvgTop = [
 //   a._id.day.localeCompare(b._id.day)
 // );
 
+allShuttlesSum.sort((a, b)=>{return a._id.day - b._id.day})
+
 colors = ['bg-warning','bg-danger','bg-success','bg-info','bg-warning','bg-success']
 
 speeds = '';
 allShuttlesSum.forEach((s) => {
-  allshuttles.push("Day#" + s._id.day);
+  allshuttles.push(s._id.day+"-"+month);
   dataSeriesAvgTop[0].data.push(s.avg_speed);
   dataSeriesAvgTop[1].data.push(s.top_speed);
   i = Math.floor((Math.random() * 5) + 1)
@@ -227,7 +231,7 @@ allShuttlesSum.forEach((s) => {
   dd=dd??0;
     speeds += `
     <div class="mb-3">
-      <div class="small text-gray-500">Day#${s._id.day}
+      <div class="small text-gray-500">${s._id.day}-${month}
         <div class="small float-right"><b>${dd} km</b></div>
       </div>
       <div class="progress" style="height: 12px;">
@@ -237,7 +241,7 @@ allShuttlesSum.forEach((s) => {
     </div>`
 });
 $(document).ready(function () {
-  $("#top-speed").append(speeds);
+  $("#mileage").append(speeds);
 });
 
 Highcharts.chart("avg-top-speed", {

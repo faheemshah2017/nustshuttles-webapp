@@ -67,7 +67,7 @@ router.get("/", authUser, function (req, res, next) {
   //   console.log(del)
   // })
 
-  data_model.getlatlngByDate(col_shuttlesData, getCurrentDate(), (d) => {
+  data_model.getlatlngByMonth(col_shuttlesData, getCurrentYear(), getCurrentMonth(), (d) => {
     const groupByDevice = d.reduce((group, data) => {
       const { deviceId } = data;
       group[deviceId] = group[deviceId] ?? [];
@@ -77,17 +77,17 @@ router.get("/", authUser, function (req, res, next) {
 
     let devices = Object.keys(groupByDevice);
     let totalDistance = 0;
-    let deviceDistance = {}
+    let deviceDistance = {};
     if (devices.length > 1) {
       devices.forEach((d) => {
         let deviceArray = groupByDevice[d];
         let distance = calculateTotalDistance(deviceArray);
         totalDistance += distance;
-        deviceDistance[deviceArray[0].deviceId] = Math.round(distance)
+        deviceDistance[deviceArray[0].deviceId] = Math.round(distance);
       });
     }
-    console.log(deviceDistance)
-    data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
+    data_model.getSummaryMonthly(col_shuttlesData, getCurrentYear(), getCurrentMonth(), (r) => {
+      console.log(r)
       let avg_speed = 0;
       let top_speed = 0;
       let top_speed_bus = "";
@@ -100,29 +100,28 @@ router.get("/", authUser, function (req, res, next) {
       });
       avg_speed = parseInt(avg_speed / r.length);
 
-      data_model.getAll(col_tracking, (tracking) => {
-        data = {
-          page: "dashboard",
-          title: "Nust Shuttles",
-          plugins: ["charts"],
-          tracking: tracking,
-          user: req.user,
-          avg_speed: avg_speed,
-          top_speed: top_speed,
-          top_speed_bus: top_speed_bus,
-          allShuttlesSum: r,
-          dDistance:deviceDistance,
-          totalDistance: parseInt(totalDistance),
-        };
-        res.render("index", data);
-      });
+      const date = new Date();
+      data = {
+        page: "dashboard",
+        title: "Nust Shuttles",
+        plugins: ["charts"],
+        user: req.user,
+        avg_speed: avg_speed,
+        top_speed: top_speed,
+        top_speed_bus: top_speed_bus,
+        allShuttlesSum: r,
+        dDistance: deviceDistance,
+        totalDistance: parseInt(totalDistance),
+        month:date.toLocaleDateString("en", {month: "short"}),
+        year:date.getFullYear()
+      };
+      res.render("index", data);
     });
   });
 });
 
 /* GET home page. */
 router.get("/map", authUser, function (req, res, next) {
-
   data_model.getlatlngByDate(col_shuttlesData, getCurrentDate(), (d) => {
     const groupByDevice = d.reduce((group, data) => {
       const { deviceId } = data;
@@ -293,5 +292,15 @@ function getCurrentDate() {
   let year = date.getFullYear();
   return `${year}-${month}-${day}`;
   // return '2022-07-31'
+}
+function getCurrentYear() {
+  const date = new Date();
+  let year = date.getFullYear();
+  return year;
+}
+function getCurrentMonth() {
+  const date = new Date();
+  let month = date.getMonth() + 1;
+  return month;
 }
 module.exports = router;

@@ -35,7 +35,8 @@ saveLogs = (message) => {
 
 /* GET home page. */
 router.get("/", authUser, function (req, res, next) {
-  data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
+  data_model.getSummaryMonthly(col_shuttlesData,getCurrentYear(),getCurrentMonth(), (r) => {
+    console.log(r)
     data = {
       page: "analytics",
       title: "Analytics | Nust Shuttles",
@@ -77,6 +78,7 @@ router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
           top_speed_bus = e._id.shuttleNumber;
         }
       });
+      const date = new Date();
       avg_speed = Math.round(avg_speed / r.length);
         data = {
           page: "analytics",
@@ -90,6 +92,8 @@ router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
           shuttle:req.params.shuttlenumber,
           totalDistance: Math.round(totalDistance),
           dailyDistance: dailyDistance,
+          month:date.toLocaleDateString("en", {month: "short"}),
+          year:date.getFullYear()
         };
         res.render("sdetails", data);
     });

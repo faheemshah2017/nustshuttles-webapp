@@ -355,6 +355,41 @@ var data_model = {
       return callback(result);
     });
   },
+  getlatlngByMonth: function (collection, year, month, callback) {
+    const agg = [
+      {
+        $project: {
+          deviceId: 1,
+          latitude: 1,
+          longitude: 1,
+          speed: 1,
+          datetime: "$datetime",
+          year: {
+            $year: "$datetime",
+          },
+          month: {
+            $month: "$datetime",
+          },
+          day: {
+            $dayOfMonth: "$datetime",
+          },
+        },
+      },
+      {
+        $match: {
+          year: year,
+          month: month,
+          speed: {
+            $gt: 0,
+          },
+        },
+      },
+    ];
+    collection.aggregate(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
   shuttlelatlngByDate: function (collection, deviceId, date, callback) {
     const query = {
       deviceId: deviceId,
@@ -396,7 +431,7 @@ var data_model = {
           year: year,
           month: month,
           speed: {
-            $gt: 2,
+            $gt: 0,
           },
         },
       },
@@ -455,7 +490,13 @@ var data_model = {
       return callback(result[0]);
     });
   },
-  getDeviceSummaryMonthly: function (collection,deviceId,year,month,callback) {
+  getDeviceSummaryMonthly: function (
+    collection,
+    deviceId,
+    year,
+    month,
+    callback
+  ) {
     const agg = [
       {
         $project: {
@@ -487,6 +528,68 @@ var data_model = {
         $group: {
           _id: {
             day: "$day",
+          },
+          avg_speed: {
+            $avg: "$speed",
+          },
+          top_speed: {
+            $max: "$speed",
+          },
+        },
+      },
+    ];
+
+    collection.aggregate(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
+  getSummaryMonthly: function (collection, year, month, callback) {
+    const agg = [
+      {
+        $lookup: {
+          from: "shuttles",
+          localField: "deviceId",
+          foreignField: "deviceId",
+          as: "result",
+        },
+      },
+      {
+        $unwind: {
+          path: "$result",
+        },
+      },
+      {
+        $project: {
+          deviceId: 1,
+          speed: 1,
+          shuttleNumber: "$result.shuttleNumber",
+          datetime: "$datetime",
+          year: {
+            $year: "$datetime",
+          },
+          month: {
+            $month: "$datetime",
+          },
+          day: {
+            $dayOfMonth: "$datetime",
+          },
+        },
+      },
+      {
+        $match: {
+          year: year,
+          month: month,
+          speed: {
+            $gt: 0,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            device: "$deviceId",
+            shuttleNumber: "$shuttleNumber",
           },
           avg_speed: {
             $avg: "$speed",
