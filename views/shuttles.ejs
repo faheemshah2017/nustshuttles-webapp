@@ -41,7 +41,7 @@
                             <tr>
                               <th>Shuttle Id</th>
                               <th>Number</th>
-                              <th>Locate</th>
+                              <!-- <th>Locate</th> -->
                               <th>Action</th>
                             </tr>
                           </thead>
@@ -52,11 +52,11 @@
                   </div>
                 </div>
                 <!--Row-->
-                <div class="row mb-3">
+                <!-- <div class="row mb-3">
                   <div class="col-lg-12">
                     <div id="map" style="height:480px;"></div>
                   </div>
-                </div>
+                </div> -->
                 <!-- Modal Logout -->
                 <div class="modal fade" id="addShutteModal" tabindex="-1" role="dialog"
                   aria-labelledby="exampleModalLabelLogout" aria-hidden="true">
@@ -138,9 +138,10 @@
   </body>
 
   <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
-  <script
+  <!-- <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpx_pUdrVXPkpH8d36RDyvIY1HrEA082E &callback=initMap&libraries=&v=weekly"
-    async></script>
+    async>
+  </script> -->
   <script>
     routes = <%- JSON.stringify(routes); %>;
     shuttles = <%- JSON.stringify(shuttles); %>;

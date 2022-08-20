@@ -131,7 +131,7 @@
             url: `/img/${shuttle.status}.png`, // url
             scaledSize: new google.maps.Size(50, 50), // scaled size
           },
-          title: "Shuttle# " + shuttle.deviceId
+          title: "Shuttle# " + shuttle.shuttleNumber
         });
       });
       new MarkerClusterer(map, markers, {

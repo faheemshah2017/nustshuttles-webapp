@@ -1,6 +1,7 @@
 let map;
 var newRoute = [];
 var i = 1;
+var markerIndex = 0;
 var lastRoute = 0;
 var infoWindow;
 var addingRoute = false;
@@ -26,6 +27,9 @@ function initMap() {
       document.getElementById("map").style.height = "800px";
     }
   );
+
+  
+  map.setOptions({ draggableCursor: 'pointer, default' });
 
   // Pick your pin (hole or no hole)
   var pinSVGHole =
@@ -76,10 +80,14 @@ function initMap() {
     });
     try {
       flightPath[lastRoute].setMap(null);
-      marker[lastRoute].setMap(null);
     } catch (e) {}
     flightPath[i].setMap(map);
     lastRoute = i;
+    try {
+      markerIndex--;
+      marker[markerIndex].setMap(null)
+    } catch (e) {}
+    flightPath[i].setMap(map);
   });
 
   map.addListener("click", (mapsMouseEvent) => {
@@ -99,7 +107,7 @@ function initMap() {
         strokeWeight: 2,
       });
 
-      marker[i] = new google.maps.Marker({
+      marker[markerIndex] = new google.maps.Marker({
         map: map,
         position: mapsMouseEvent.latLng.toJSON(),
         icon: {
@@ -112,6 +120,7 @@ function initMap() {
           scale: 5,
         },
       });
+      markerIndex++;
       try {
         flightPath[lastRoute].setMap(null);
       } catch (e) {}
@@ -152,6 +161,14 @@ function cancelRoute() {
   try {
     flightPath[lastRoute].setMap(null);
   } catch (e) {}
+  
+  marker.forEach(mark=>{
+    try{
+      mark.setMap(null)
+    }catch(e){}
+  })
+  markerIndex = 0;
+  marker = [];
 }
 
 function addRoute() {
@@ -174,6 +191,7 @@ function addRoute() {
 
   try {
     flightPath[lastRoute].setMap(null);
+    marker[lastRoute].setMap(null);
   } catch (e) {}
   infoWindow.open(map);
   hideLabels();
@@ -194,7 +212,7 @@ function showLabels() {
 }
 
 const flightPath = [];
-const marker = [];
+var marker = [];
 var lastRoute = 0;
 function changeRoute(e) {
   selectRoute(e.target.value);
@@ -226,9 +244,17 @@ function distance(lat1, lat2, lon1, lon2) {
   return c * r;
 }
 
+enableStops = false;
+
+const enableStopsCheckbox = document.getElementById('enableStopsCheckbox')
+
+enableStopsCheckbox.addEventListener('change', (event) => {
+  enableStops = event.target.checked
+})
+
 
 function selectRoute(routeID) {
-let totalDistance = 0;
+// let totalDistance = 0;
   let flightPlanCoordinates = routes.find((r) => r._id == routeID).path;
   flightPath[routeID] = new google.maps.Polyline({
     path: flightPlanCoordinates,
@@ -237,15 +263,14 @@ let totalDistance = 0;
     strokeOpacity: 1.0,
     strokeWeight: 2,
   });
-  flightPlanCoordinates.forEach((point,i)=>{
-    try{
-        totalDistance += distance(flightPlanCoordinates[i].lat, flightPlanCoordinates[i+1].lat, flightPlanCoordinates[i].lng, flightPlanCoordinates[i+1].lng);
-    }
-    catch(e){
+  // flightPlanCoordinates.forEach((point,i)=>{
+  //   try{
+  //       totalDistance += distance(flightPlanCoordinates[i].lat, flightPlanCoordinates[i+1].lat, flightPlanCoordinates[i].lng, flightPlanCoordinates[i+1].lng);
+  //   }
+  //   catch(e){
 
-    }
-  })
-console.log(totalDistance)
+  //   }
+  // })
   // flightPlanCoordinates.forEach(point=>{
   //     new google.maps.Marker({
   //         map: map,
@@ -261,6 +286,31 @@ console.log(totalDistance)
   //         }
   //     });
   // })
+  marker.forEach(mark=>{
+    try{
+      mark.setMap(null)
+    }catch(e){}
+  })
+  marker = [];
+  if(enableStops){
+    flightPlanCoordinates.forEach((fpc,i)=>{
+      marker[i] = new google.maps.Marker({
+        map: map,
+        position: fpc,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: "#224879",
+          fillOpacity: 1,
+          strokeColor: "#224879",
+          strokeOpacity: 1,
+          strokeWeight: 1,
+          scale: 5,
+        },
+        title: "Stop#"+i
+      });
+    })
+  }
+
   try {
     flightPath[lastRoute].setMap(null);
   } catch (e) {}

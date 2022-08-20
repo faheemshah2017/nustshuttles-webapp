@@ -84,20 +84,21 @@ router.post('/sendLocation', (req, res, next) => {
   const dataDate = new Date(shuttleData.time * 1000);
   let hours = dataDate.getHours()+5;
   let minutes = dataDate.getMinutes();
+  let day = dataDate.getDay()
   time = hours+(minutes/100)
   console.log("data received from deviceId: "+req.body.deviceId)
-  if(time>17.00||time<8.30){
+  if((time>17.15||time<8.30)&&day>5){
     console.log("its off time")
-    shuttleData.idleTIme = 0;
+    shuttleData.idleTime = 0;
   }
   else{
     if(shuttleData.speed==0){
       console.log("Shuttle is idle")
-      shuttleData.idleTIme = 10;
+      shuttleData.idleTime = 5;
     }
     else{
       console.log("shuttle is active")
-      shuttleData.idleTIme = 0;
+      shuttleData.idleTime = 0;
     }  
     console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {

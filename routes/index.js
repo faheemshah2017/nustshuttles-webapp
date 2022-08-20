@@ -36,58 +36,24 @@ saveLogs = (message) => {
 
 /* GET home page. */
 router.get("/", authUser, function (req, res, next) {
-  // let i=0;
-  // data_model.getAll(col_shuttlesData, (d) => {
-  //   d.forEach(g=>{
-  //     let geodata = {
-  //       deviceId: g.deviceId,
-  //       latitude: parseFloat(g.latitude),
-  //       longitude: parseFloat(g.longitude),
-  //       speed: parseInt(g.speed),
-  //       time: parseInt(g.time),
-  //       location: {
-  //         type: "Point",
-  //         coordinates: [
-  //           parseFloat(g.longitude),
-  //           parseFloat(g.latitude),
-  //         ],
-  //       },
-  //       datetime: new Date(parseInt(g.time) * 1000),
-  //     };
-  //     data_model.update(col_shuttlesData, g._id, geodata, (r)=>{
-  //       console.log(i++)
-  //     })
-  //   })
-  // });
+    const date = new Date();
+    data = {
+      page: "dashboard",
+      title: "Nust Shuttles",
+      plugins: [],
+      user: req.user,
+      month: date.toLocaleDateString("en", { month: "short" }),
+      year: date.getFullYear(),
+    };
+    res.render("index", data);
+});
 
-  // let query = {
-  //   datetime:{ $gte : new Date("2022-07-17") }
-  // }
-  // data_model.deleteAllByQuery(col_shuttlesData,query,(del)=>{
-  //   console.log(del)
-  // })
-
-  data_model.getlatlngByMonth(col_shuttlesData, getCurrentYear(), getCurrentMonth(), (d) => {
-    const groupByDevice = d.reduce((group, data) => {
-      const { deviceId } = data;
-      group[deviceId] = group[deviceId] ?? [];
-      group[deviceId].push(data);
-      return group;
-    }, {});
-
-    let devices = Object.keys(groupByDevice);
-    let totalDistance = 0;
-    let deviceDistance = {};
-    if (devices.length > 1) {
-      devices.forEach((d) => {
-        let deviceArray = groupByDevice[d];
-        let distance = calculateTotalDistance(deviceArray);
-        totalDistance += distance;
-        deviceDistance[deviceArray[0].deviceId] = Math.round(distance);
-      });
-    }
-    data_model.getSummaryMonthly(col_shuttlesData, getCurrentYear(), getCurrentMonth(), (r) => {
-      console.log(r)
+router.get("/getSummaryMonthly", authUser, function (req, res, next) {
+  data_model.getSummaryMonthly(
+    col_shuttlesData,
+    getCurrentYear(),
+    getCurrentMonth(),
+    (r) => {
       let avg_speed = 0;
       let top_speed = 0;
       let top_speed_bus = "";
@@ -100,73 +66,75 @@ router.get("/", authUser, function (req, res, next) {
       });
       avg_speed = parseInt(avg_speed / r.length);
 
-      const date = new Date();
       data = {
-        page: "dashboard",
-        title: "Nust Shuttles",
-        plugins: ["charts"],
-        user: req.user,
         avg_speed: avg_speed,
         top_speed: top_speed,
         top_speed_bus: top_speed_bus,
         allShuttlesSum: r,
+      };
+      res.send(data);
+    }
+  );
+});
+
+router.get("/getIdleTimeMonthly", authUser, function (req, res, next) {
+  data_model.getIdleTimeMonthly(
+    col_shuttlesData,
+    getCurrentYear(),
+    getCurrentMonth(),
+    (idle) => {
+      data = {
+        idleTime: idle,
+      };
+      res.send(data);
+    }
+  );
+});
+
+router.get("/getlatlngByMonth", authUser, function (req, res, next) {
+  data_model.getlatlngByMonth(
+    col_shuttlesData,
+    getCurrentYear(),
+    getCurrentMonth(),
+    (d) => {
+      const groupByDevice = d.reduce((group, data) => {
+        const { deviceId } = data;
+        group[deviceId] = group[deviceId] ?? [];
+        group[deviceId].push(data);
+        return group;
+      }, {});
+
+      let devices = Object.keys(groupByDevice);
+      let totalDistance = 0;
+      let deviceDistance = {};
+      if (devices.length > 1) {
+        devices.forEach((d) => {
+          let deviceArray = groupByDevice[d];
+          let distance = calculateTotalDistance(deviceArray);
+          totalDistance += distance;
+          deviceDistance[deviceArray[0].deviceId] = Math.round(distance);
+        });
+      }
+      data = {
         dDistance: deviceDistance,
         totalDistance: parseInt(totalDistance),
-        month:date.toLocaleDateString("en", {month: "short"}),
-        year:date.getFullYear()
       };
-      res.render("index", data);
-    });
-  });
+      res.send(data);
+    }
+  );
 });
 
 /* GET home page. */
 router.get("/map", authUser, function (req, res, next) {
-  data_model.getlatlngByDate(col_shuttlesData, getCurrentDate(), (d) => {
-    const groupByDevice = d.reduce((group, data) => {
-      const { deviceId } = data;
-      group[deviceId] = group[deviceId] ?? [];
-      group[deviceId].push(data);
-      return group;
-    }, {});
-
-    let devices = Object.keys(groupByDevice);
-    let totalDistance = 0;
-    if (devices.length > 1) {
-      devices.forEach((d) => {
-        let deviceArray = groupByDevice[d];
-        totalDistance += calculateTotalDistance(deviceArray);
-      });
-    }
-    data_model.getSummary(col_shuttlesData, getCurrentDate(), (r) => {
-      let avg_speed = 0;
-      let top_speed = 0;
-      let top_speed_bus = "";
-      r.forEach((e) => {
-        avg_speed += e.avg_speed;
-        if (e.top_speed > top_speed) {
-          top_speed = e.top_speed;
-          top_speed_bus = e._id.shuttleNumber;
-        }
-      });
-      avg_speed = parseInt(avg_speed / r.length);
-
-      data_model.getAll(col_tracking, (tracking) => {
-        data = {
-          page: "map",
-          title: "Nust Shuttles",
-          plugins: [],
-          tracking: tracking,
-          user: req.user,
-          avg_speed: avg_speed,
-          top_speed: top_speed,
-          top_speed_bus: top_speed_bus,
-          allShuttlesSum: r,
-          totalDistance: parseInt(totalDistance),
-        };
-        res.render("map", data);
-      });
-    });
+  data_model.getTracking(col_tracking, (tracking) => {
+    data = {
+      page: "map",
+      title: "Nust Shuttles",
+      plugins: [],
+      tracking: tracking,
+      user: req.user,
+    };
+    res.render("map", data);
   });
 });
 
