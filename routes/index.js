@@ -138,6 +138,12 @@ router.get("/map", authUser, function (req, res, next) {
   });
 });
 
+router.get("/getTracking", authUser, function (req, res, next) {
+  data_model.getTracking(col_tracking, (tracking) => {
+    res.send(tracking);
+  });
+});
+
 router.get("/login", function (req, res, next) {
   data = {
     title: "Login | Nust Shuttles",
