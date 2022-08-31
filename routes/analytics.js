@@ -130,12 +130,15 @@ function calculateTotalDistance(path) {
   let totalDistance = 0;
   path.forEach((point, i) => {
     try {
-      totalDistance += distance(
+      let dist = distance(
         path[i].latitude,
         path[i + 1].latitude,
         path[i].longitude,
         path[i + 1].longitude
       );
+      if(dist<1){
+        totalDistance +=dist
+      }
     } catch (e) {}
   });
   return totalDistance;

@@ -307,6 +307,7 @@ var data_model = {
           },
           speed: {
             $gt: 2,
+            $lt: 60,
           },
         },
       },
@@ -365,6 +366,7 @@ var data_model = {
           },
           speed: {
             $gt: 0,
+            $lt: 60,
           },
         },
       },
@@ -383,6 +385,7 @@ var data_model = {
       },
       speed: {
         $gt: 0,
+        $lt: 60,
       },
     };
     collection.find(agg).toArray(function (err, result) {
@@ -416,6 +419,7 @@ var data_model = {
           month: month,
           speed: {
             $gt: 2,
+            $lt: 60,
           },
         },
       },
@@ -433,6 +437,7 @@ var data_model = {
       },
       speed: {
         $gt: 0,
+        $lt: 60,
       },
     };
     collection.find(query).toArray(function (err, result) {
@@ -467,6 +472,7 @@ var data_model = {
           month: month,
           speed: {
             $gt: 0,
+            $lt: 60,
           },
         },
       },
@@ -502,6 +508,7 @@ var data_model = {
           },
           speed: {
             $gt: 2,
+            $lt: 60,
           },
         },
       },
@@ -556,6 +563,7 @@ var data_model = {
           month: month,
           speed: {
             $gt: 2,
+            $lt: 60,
           },
         },
       },
@@ -617,6 +625,7 @@ var data_model = {
           month: month,
           speed: {
             $gt: 2,
+            $lt: 60,
           },
         },
       },

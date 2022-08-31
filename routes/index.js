@@ -111,8 +111,8 @@ router.get("/getlatlngByMonth", authUser, function (req, res, next) {
         devices.forEach((d) => {
           let deviceArray = groupByDevice[d];
           let distance = calculateTotalDistance(deviceArray);
-          totalDistance += distance;
-          deviceDistance[deviceArray[0].deviceId] = Math.round(distance);
+            totalDistance += distance;
+            deviceDistance[deviceArray[0].deviceId] = Math.round(distance);
         });
       }
       data = {
@@ -239,12 +239,15 @@ function calculateTotalDistance(path) {
   let totalDistance = 0;
   path.forEach((point, i) => {
     try {
-      totalDistance += distance(
+      let dist = distance(
         path[i].latitude,
         path[i + 1].latitude,
         path[i].longitude,
         path[i + 1].longitude
       );
+      if(dist<1){
+        totalDistance +=dist
+      }
     } catch (e) {}
   });
   return totalDistance;
