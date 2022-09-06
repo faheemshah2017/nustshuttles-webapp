@@ -128,6 +128,10 @@ function addRoute(){
         to:$("#timeTo").val(),
         path:getRoutePath($("#shuttleRoute").val())
     })
+    document.getElementById("addRouteBtn").innerHTML = "Add";
+    document.getElementById("shuttleRoute").value = "";
+    document.getElementById("timeFrom").value = "";
+    document.getElementById("timeTo").value = "";
     updateList()
 }
 
@@ -143,7 +147,10 @@ function updateList(){
           </div>
           <div class="col-md-3 pl-4">`+e.to+`
           </div>
-          <div class="col-md-3">
+          <div class="col-md-1">
+            <span class="btn btn-outline-primary btn-block" onclick="editRoute(`+e.id+`)"><i class="fas fa-edit"></i></span>
+          </div>
+          <div class="col-md-2">
             <span class="btn btn-outline-danger btn-block" onclick="deleteRoute(`+e.id+`)">Delete</span>
           </div>
         </div>`)
@@ -155,6 +162,18 @@ function deleteRoute(id){
     updateList();
 }
 
+function editRoute(id){
+    editingRoute = routesList.find(r=> r.id==id)
+    if(document.getElementById("addRouteBtn").innerHTML != "Update"){
+        document.getElementById("shuttleRoute").value = editingRoute._id;
+        document.getElementById("timeFrom").value = editingRoute.from;
+        document.getElementById("timeTo").value = editingRoute.to;
+        document.getElementById("addRouteBtn").innerHTML = "Update";
+        routesList = routesList.filter(r=> r.id!=id)
+        updateList();
+    }
+}
+
 
 function getRouteNumber(routeID){
     return (routes.filter(r=>r._id==routeID))[0].routeNumber
@@ -163,7 +182,6 @@ function getRouteNumber(routeID){
 function getRoutePath(routeID){
     let path = (routes.filter(r=>r._id==routeID))[0].path
     path.map(p=>(!p.point)?p.point="nill":p.point=p.point);
-    debugger
     return path;
 }
 
