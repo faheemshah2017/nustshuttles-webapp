@@ -1,0 +1,89 @@
+server {
+    listen       10.250.7.206:80 default;
+    server_name  _;
+    #access_log  /var/log/nginx/10.250.7.206.log main;
+    location / {
+        proxy_pass  http://10.250.7.206:3000;
+   }
+}
+
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name nustshuttles.online www.nustshuttles.online;
+
+location ~ "^/\.well-known/acme-challenge/(.*)$" {
+    default_type text/plain;
+    return 200 "$1.3ycRFG5fzHXAQzFzsfz0So7mM_zzxphnTWumP4-TCeo";
+}
+
+    return 301 https://nustshuttles.online$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name www.nustshuttles.online
+    ssl on;
+ssl_certificate  /home/nustshuttles/conf/web/ssl.certificate.crt;
+  ssl_certificate_key /home/nustshuttles/conf/web/private.key;
+
+location ~ "^/\.well-known/acme-challenge/(.*)$" {
+    default_type text/plain;
+    return 200 "$1.3ycRFG5fzHXAQzFzsfz0So7mM_zzxphnTWumP4-TCeo";
+}
+
+    return 301 https://nustshuttles.online$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+   
+    server_name nustshuttles.online www.nustshuttles.online;
+   
+    charset utf-8;
+   
+    keepalive_timeout 70;
+
+    ssl on;
+    ssl_certificate  /home/nustshuttles/conf/web/certificate.crt;
+  ssl_certificate_key /home/nustshuttles/conf/web/private.key;
+    ssl_prefer_server_ciphers on;
+
+location ~ "^/\.well-known/acme-challenge/(.*)$" {
+    default_type text/plain;
+    return 200 "$1.3ycRFG5fzHXAQzFzsfz0So7mM_zzxphnTWumP4-TCeo";
+}
+   
+    location / {
+        proxy_pass http://10.250.7.206:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+
+}
+
+server{
+    listen 80;
+    server_name wach.quest;
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_pass http://10.250.7.206:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        # location /overview {
+        #     proxy_pass http://10.250.7.206:3000$request_uri;
+        #     proxy_redirect off;
+        # }
+    }
+}
+

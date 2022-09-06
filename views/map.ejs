@@ -64,6 +64,13 @@
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpx_pUdrVXPkpH8d36RDyvIY1HrEA082E &callback=initMap&libraries=&v=weekly"
     async></script>
+    <style>
+      .marker-position {
+          bottom: 36px;
+          left: 0;
+          position: relative;
+      }
+    </style>
   <script>
     let map;
     tracking = <%- JSON.stringify(tracking); %>;
@@ -120,6 +127,13 @@
           icon: {
             url: `/img/${shuttle.status}.png`, // url
             scaledSize: new google.maps.Size(50, 50), // scaled size
+          },
+          label:
+          {
+            text: "#" + shuttle.shuttleNumber,
+            color: '#224879',
+            fontSize: '18px',
+            className: 'marker-position',
           },
           title: "Shuttle# " + shuttle.shuttleNumber
         });
