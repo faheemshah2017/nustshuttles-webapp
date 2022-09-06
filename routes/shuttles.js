@@ -94,7 +94,7 @@ router.post('/sendLocation', (req, res, next) => {
   else{
     if(shuttleData.speed==0){
       console.log("Shuttle is idle")
-      shuttleData.idleTime = 5;
+      shuttleData.idleTime = 1;
     }
     else{
       console.log("shuttle is active")

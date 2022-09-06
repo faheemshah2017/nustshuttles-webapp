@@ -242,7 +242,6 @@
   
 let allshuttles = [];
 
-colors = ['bg-warning','bg-danger','bg-success','bg-info','bg-warning','bg-success']
 
 
 if(localStorage.avgSpeedMonthly){
@@ -396,7 +395,6 @@ function setIdleGraph(idleTime){
     series: dataIdleTime,
   });
 }
-
 function setDeviceDistanceGraph(dDistance,totalDistance){
     $("#totalDistance").html(totalDistance+" km");
     distances = ''
@@ -407,13 +405,20 @@ function setDeviceDistanceGraph(dDistance,totalDistance){
       i = Math.floor((Math.random() * 5) + 1)
       let dd = dDistance[s._id.device]
       dd=dd??0;
+      let color = 'bg-success';
+      if((dd/30)>50){
+        color = 'bg-warning'
+      }
+      if((dd/30)>80){
+        color = 'bg-danger'
+      }
       distances += `
         <div class="mb-3">
           <div class="small text-gray-500">Shuttle#${s._id.shuttleNumber}
             <div class="small float-right"><b>${dd} km</b></div>
           </div>
           <div class="progress" style="height: 12px;">
-            <div class="progress-bar ${colors[i]}" role="progressbar" style="width: ${dd/30}%"
+            <div class="progress-bar ${color}" role="progressbar" style="width: ${dd/30}%"
               aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
         </div>`
