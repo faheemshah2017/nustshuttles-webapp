@@ -263,29 +263,6 @@ function selectRoute(routeID) {
     strokeOpacity: 1.0,
     strokeWeight: 2,
   });
-  // flightPlanCoordinates.forEach((point,i)=>{
-  //   try{
-  //       totalDistance += distance(flightPlanCoordinates[i].lat, flightPlanCoordinates[i+1].lat, flightPlanCoordinates[i].lng, flightPlanCoordinates[i+1].lng);
-  //   }
-  //   catch(e){
-
-  //   }
-  // })
-  // flightPlanCoordinates.forEach(point=>{
-  //     new google.maps.Marker({
-  //         map: map,
-  //         position: point,
-  //         icon: {
-  //             path: google.maps.SymbolPath.CIRCLE,
-  //             fillColor: '#224879',
-  //             fillOpacity: 1,
-  //             strokeColor: '#224879',
-  //             strokeOpacity: 1,
-  //             strokeWeight: 1,
-  //             scale: 5
-  //         }
-  //     });
-  // })
   marker.forEach(mark=>{
     try{
       mark.setMap(null)
@@ -294,19 +271,31 @@ function selectRoute(routeID) {
   marker = [];
   if(enableStops){
     flightPlanCoordinates.forEach((fpc,i)=>{
+      stopName = `${i}`;
+      color = "#224879"
+      size = 5;
+      if(fpc.point){
+        stopName = fpc.point;
+        color = "orange";
+        size = 7
+      }
       marker[i] = new google.maps.Marker({
         map: map,
         position: fpc,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
-          fillColor: "#224879",
+          fillColor: color,
           fillOpacity: 1,
-          strokeColor: "#224879",
+          strokeColor: color,
           strokeOpacity: 1,
           strokeWeight: 1,
-          scale: 5,
+          scale: size,
         },
-        title: "Stop#"+i
+        title: stopName
+      });
+      marker[i].addListener("click", () => {
+        document.getElementById("stopId").value = marker[i].title;
+        $('#addStopModal').modal('show');
       });
     })
   }
@@ -466,5 +455,53 @@ function confirmDelete(route) {
         },
       });
     }
+  });
+}
+
+function submitStop() {
+  var values = {};
+  $.each($("#stop_form").serializeArray(), function (i, field) {
+    values[field.name] = field.value;
+  });
+
+  selectedRouteId = document.getElementById("selectedRoute").value;
+  selectedRoute = routes.find((r) => r._id == selectedRouteId);
+  selectedRoutePath = selectedRoute.path[parseInt(values.stopId)]
+  selectedRoutePath.point = values.stopName;
+  selectedRoute.path[parseInt(values.stopId)] = selectedRoutePath;
+  
+  delete selectedRoute.rowId;
+  delete selectedRoute._id;
+  $.ajax({
+    url: "/routes/update/" + selectedRouteId,
+    data: JSON.stringify(selectedRoute),
+    cache: false,
+    processData: false,
+    contentType: "application/json",
+    type: "POST",
+    success: function (dataofconfirm) {
+      $("#addStopModal").modal("hide");
+      $(".modal-backdrop").remove();
+
+      $("form#stop_form").trigger("reset");
+
+      swal({
+        type: "success",
+        icon: "success",
+        title: "Stop Added",
+        showConfirmButton: !1,
+        timer: 3000,
+      }).then(function () {
+        $.ajax({
+          url: "/routes/get",
+          contentType: "application/json",
+          type: "GET",
+          success: function (r) {
+            routes = r
+            selectRoute(selectedRouteId)
+          },
+        });
+      });
+    },
   });
 }
