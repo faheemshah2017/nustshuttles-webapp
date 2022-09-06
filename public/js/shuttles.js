@@ -162,7 +162,8 @@ function getRouteNumber(routeID){
 
 function getRoutePath(routeID){
     let path = (routes.filter(r=>r._id==routeID))[0].path
-    path.map(p=>p.point="nill");
+    path.map(p=>(!p.point)?p.point="nill":p.point=p.point);
+    debugger
     return path;
 }
 
