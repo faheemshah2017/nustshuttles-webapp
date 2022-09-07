@@ -125,20 +125,20 @@ router.post('/sendLocation', (req, res, next) => {
     }  
     console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
-      alertData = {
-        "time":new Date(parseInt(req.body.time)*1000),
-        "shuttleNumber": shuttle.shuttleNumber,
-        "speed":req.body.speed,
-        "location":{
-          type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
-        },
-        "message":`Shuttle#${shuttle.shuttleNumber} violated the speed  limit (speed:${req.body.speed})`
-      }
-      console.log(alertData)
-      if(shuttleData.speed>40){
-        data_model.add(col_alerts, alertData, (resp) => {});
-      }
       data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
+        alertData = {
+          "time":new Date(parseInt(req.body.time)*1000),
+          "shuttleNumber": shuttle.shuttleNumber,
+          "speed":req.body.speed,
+          "location":{
+            type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
+          },
+          "message":`Shuttle#${shuttle.shuttleNumber} violated the speed  limit (speed:${req.body.speed})`
+        }
+        console.log(alertData)
+        if(shuttleData.speed>40){
+          data_model.add(col_alerts, alertData, (resp) => {});
+        }
         let data = {
           deviceId:req.body.deviceId,
           busNumber:shuttle.shuttleNumber,
