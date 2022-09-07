@@ -68,6 +68,10 @@ router.get('/location', function (req, res, next) {
   })
 });
 
+shuttlesStates = {
+
+}
+
 router.post('/sendLocation', (req, res, next) => {
   
   let shuttleData = {
@@ -87,21 +91,53 @@ router.post('/sendLocation', (req, res, next) => {
   let day = dataDate.getDay()
   time = hours+(minutes/100)
   console.log("data received from deviceId: "+req.body.deviceId)
-  if((time>17.15||time<8.30)&&day>5){
+  if(!shuttlesStates[req.body.deviceId]){
+    console.log("setting shuttlesStates variable for shuttle#"+req.body.deviceId)
+    shuttlesStates[req.body.deviceId] = 0
+  }
+  if((time>17.00||time<8.30)&&day>5){
     console.log("its off time")
     shuttleData.idleTime = 0;
+    shuttleData.stoppedTime = 0;
   }
   else{
     if(shuttleData.speed==0){
-      console.log("Shuttle is idle")
-      shuttleData.idleTime = 1;
+      shuttlesStates[req.body.deviceId]+=20;
+      if(shuttlesStates[req.body.deviceId]>300){
+        console.log("Shuttle is stopped")
+        shuttleData.idleTime = 0;
+        shuttleData.stoppedTime = 20;
+      }
+      else if(shuttlesStates[req.body.deviceId]>300){
+        console.log("Shuttle is idle")
+        shuttleData.idleTime = 20;
+        shuttleData.stoppedTime = 0;
+      }
+      else{
+        console.log("Shuttle speed is zero since: "+shuttlesStates[req.body.deviceId])
+      }
     }
     else{
       console.log("shuttle is active")
+      shuttlesStates[req.body.deviceId] = 0;
       shuttleData.idleTime = 0;
+      shuttleData.stoppedTime = 0;
     }  
     console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
+      alertData = {
+        "time":new Date(parseInt(req.body.time)*1000),
+        "shuttleNumber": shuttle.shuttleNumber,
+        "speed":req.body.speed,
+        "location":{
+          type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
+        },
+        "message":`Shuttle#${shuttle.shuttleNumber} violated the speed  limit (speed:${req.body.speed})`
+      }
+      console.log(alertData)
+      if(shuttleData.speed>40){
+        data_model.add(col_alerts, alertData, (resp) => {});
+      }
       data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
         let data = {
           deviceId:req.body.deviceId,
