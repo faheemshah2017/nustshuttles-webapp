@@ -1,6 +1,28 @@
 <%- include('./partials/header') %>
 
   <body id="page-top">
+    <style>
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 3px solid #ffa426!important;
+      width: 20px;
+      height: 20px;
+      -webkit-animation: spin 1s linear infinite; /* Safari */
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style>
     <div id="wrapper">
       <!-- Sidebar -->
       <%- include('./partials/sidebar') %>
@@ -14,11 +36,12 @@
               <!-- Container Fluid-->
               <div class="container-fluid" id="container-wrapper">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                  <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                  <h1 class="h3 mb-0 text-gray-800"><%=month%>-<%=year%></h1>
-                  <!-- <div class="row">
+                  <h1 class="h3 mb-0 text-gray-800">Dashboard
+                    <button onclick="syncData()" id="syncDataBtn" class="btn btn-primary" style="height: 41px;margin-top: 1px;"> &#x27f3; Sync</button>
+                  </h1>
+                  <div class="row">
                     <div class="col-md-5">
-                      <select class="form-control" style="width: 80px;" onchange="monthSelected(this)" name="month">
+                      <select class="form-control" style="width: 80px;" onchange="monthSelected(this)" id="month">
                         <option value="1">Jan</option>
                         <option value="2">Feb</option>
                         <option value="3">Mar</option>
@@ -34,14 +57,14 @@
                       </select> 
                     </div>
                     <div class="col-md-7">
-                      <select class="form-control" name="year">
+                      <select class="form-control" onchange="yearSelected(this)" id="year">
                         <option value="2022">2022</option>
                         <option value="2023">2023</option>
                         <option value="2024">2024</option>
                         <option value="2025">2025</option>
                       </select> 
                     </div>
-                  </div> -->
+                  </div>
                   <!-- <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="./">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
@@ -184,7 +207,7 @@
                   <div class="col-xl-12 col-lg-12">
                     <div class="card mb-4">
                       <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Total Idle Time (<%=month%>)</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Total Idle Time This Month</h6>
                       </div>
                       <div class="card-body">
                         <div id="idle-time"></div>
@@ -243,18 +266,35 @@
 let allshuttles = [];
 
 
+const date = new Date();
+month = date.getMonth() + 1;
+year = date.getFullYear();
 
-if(localStorage.avgSpeedMonthly){
-  setSummaryMonthly()
+document.getElementById("month").value = month;
+document.getElementById("year").value = year;
+
+setData(year,month)
+
+function monthSelected(e){
+  month = e.value
+  setData(year,month)
 }
 
-function setSummaryMonthly(){
-      
-  $("#topSpeedShuttle").html("Shuttle#"+localStorage.topSpeedBusNumber);
-  $("#avgSpeed").html(localStorage.avgSpeedMonthly+" kph");
-  $("#topSpeed").html(localStorage.topSpeedMonthly+" kph");
+function yearSelected(e){
+  year = e.value
+  setData(year,month)
+}
 
-  allShuttlesSum = JSON.parse(localStorage.allShuttlesSumMonthly)
+function syncData(){
+  getNewData(year,month)
+}
+
+function setSummaryMonthly(year,month){
+  $("#topSpeedShuttle").html("Shuttle#"+localStorage.getItem(`${year}${month}topSpeedBusNumber`));
+  $("#avgSpeed").html(localStorage.getItem(`${year}${month}avgSpeedMonthly`)+"kph");
+  $("#topSpeed").html(localStorage.getItem(`${year}${month}topSpeedMonthly`)+"kph");
+
+  allShuttlesSum = JSON.parse(localStorage.getItem(`${year}${month}allShuttlesSumMonthly`))
 
   let dataSeriesAvgTop = [
     {
@@ -318,22 +358,7 @@ function setSummaryMonthly(){
     series: dataSeriesAvgTop,
   });
 }
-  
 
-idleshuttles = [];
-idleTime = localStorage.idleTimeMonthly;
-deviceDistanceMonthly = localStorage.deviceDistanceMonthly;
-deviceTDistanceMonthly = localStorage.deviceTDistanceMonthly;
-
-if(idleTime){
-  idleTime = JSON.parse(idleTime)
-  setIdleGraph(idleTime);
-}
-if(deviceDistanceMonthly){
-  deviceDistanceMonthly = JSON.parse(deviceDistanceMonthly)
-  deviceTDistanceMonthly = JSON.parse(deviceTDistanceMonthly)
-  setDeviceDistanceGraph(deviceDistanceMonthly,deviceTDistanceMonthly);
-}
 function setIdleGraph(idleTime){
   
   idleTime.sort((a, b) =>
@@ -396,71 +421,98 @@ function setIdleGraph(idleTime){
   });
 }
 function setDeviceDistanceGraph(dDistance,totalDistance){
-    $("#totalDistance").html(totalDistance+" km");
-    distances = ''
-    allShuttlesSum.forEach((s) => {
-      // allshuttles.push("Shuttle#" + s._id.shuttleNumber);
-      // dataSeriesAvgTop[0].data.push(s.avg_speed);
-      // dataSeriesAvgTop[1].data.push(s.top_speed);
-      i = Math.floor((Math.random() * 5) + 1)
-      let dd = dDistance[s._id.device]
-      dd=dd??0;
-      let color = 'bg-success';
-      if((dd/30)>50){
-        color = 'bg-warning'
-      }
-      if((dd/30)>80){
-        color = 'bg-danger'
-      }
-      distances += `
-        <div class="mb-3">
-          <div class="small text-gray-500">Shuttle#${s._id.shuttleNumber}
-            <div class="small float-right"><b>${dd} km</b></div>
-          </div>
-          <div class="progress" style="height: 12px;">
-            <div class="progress-bar ${color}" role="progressbar" style="width: ${dd/30}%"
-              aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </div>`
-    });
-    $("#shuttle-distances").html(distances);
+  $("#totalDistance").html(totalDistance+" km");
+  distances = ''
+  allShuttlesSum.forEach((s) => {
+    // allshuttles.push("Shuttle#" + s._id.shuttleNumber);
+    // dataSeriesAvgTop[0].data.push(s.avg_speed);
+    // dataSeriesAvgTop[1].data.push(s.top_speed);
+    i = Math.floor((Math.random() * 5) + 1)
+    let dd = dDistance[s._id.device]
+    dd=dd??0;
+    let color = 'bg-success';
+    if((dd/30)>50){
+      color = 'bg-warning'
+    }
+    if((dd/30)>80){
+      color = 'bg-danger'
+    }
+    distances += `
+      <div class="mb-3">
+        <div class="small text-gray-500">Shuttle#${s._id.shuttleNumber}
+          <div class="small float-right"><b>${dd} km</b></div>
+        </div>
+        <div class="progress" style="height: 12px;">
+          <div class="progress-bar ${color}" role="progressbar" style="width: ${dd/30}%"
+            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>`
+  });
+  $("#shuttle-distances").html(distances);
+}
+function setData(year,month){
+  if(localStorage.getItem(`${year}${month}avgSpeedMonthly`)){
+    setSummaryMonthly(year,month)
   }
+  else{
+    getNewData(year,month)
+  }
+  idleshuttles = [];
+  idleTime = localStorage.getItem(`${year}${month}idleTimeMonthly`);
+  deviceDistanceMonthly = localStorage.getItem(`${year}${month}deviceDistanceMonthly`);
+  deviceTDistanceMonthly = localStorage.getItem(`${year}${month}deviceTDistanceMonthly`);
+
+  if(idleTime){
+    idleTime = JSON.parse(idleTime)
+    setIdleGraph(idleTime);
+  }
+  if(deviceDistanceMonthly){
+    deviceDistanceMonthly = JSON.parse(deviceDistanceMonthly)
+    deviceTDistanceMonthly = JSON.parse(deviceTDistanceMonthly)
+    setDeviceDistanceGraph(deviceDistanceMonthly,deviceTDistanceMonthly);
+  }
+}
+
+function getNewData(year,month){
+  document.getElementById("syncDataBtn").innerHTML = `<div class="loader"></div>`
   $.ajax({
-    url: "/getSummaryMonthly",
+    url: `/getSummaryMonthly/${year}/${month}`,
     cache: false,
     processData: false,
     type: "GET",
     success: function (data) {
-      localStorage.setItem("avgSpeedMonthly",JSON.stringify(data.avg_speed))
-      localStorage.setItem("topSpeedMonthly",JSON.stringify(data.top_speed))
-      localStorage.setItem("topSpeedBusNumber",JSON.stringify(data.top_speed_bus))
-      localStorage.setItem("allShuttlesSumMonthly",JSON.stringify(data.allShuttlesSum))
-      setSummaryMonthly();
+      localStorage.setItem(`${year}${month}avgSpeedMonthly`,JSON.stringify(data.avg_speed))
+      localStorage.setItem(`${year}${month}topSpeedMonthly`,JSON.stringify(data.top_speed))
+      localStorage.setItem(`${year}${month}topSpeedBusNumber`,JSON.stringify(data.top_speed_bus))
+      localStorage.setItem(`${year}${month}allShuttlesSumMonthly`,JSON.stringify(data.allShuttlesSum))
+      setSummaryMonthly(year,month);
     },
   });
 
   $.ajax({
-    url: "/getIdleTimeMonthly",
+    url: `/getIdleTimeMonthly/${year}/${month}`,
     cache: false,
     processData: false,
     type: "GET",
     success: function (data) {
       setIdleGraph(data.idleTime);
-      localStorage.setItem("idleTimeMonthly",JSON.stringify(data.idleTime))
+      localStorage.setItem(`${year}${month}idleTimeMonthly`,JSON.stringify(data.idleTime))
+      document.getElementById("syncDataBtn").innerHTML = `&#x27f3; Sync`
     },
   });
 
   $.ajax({
-    url: "/getlatlngByMonth",
+    url: `/getlatlngByMonth/${year}/${month}`,
     cache: false,
     processData: false,
     type: "GET",
     success: function (data) {
       setDeviceDistanceGraph(data.dDistance,data.totalDistance);
-      localStorage.setItem("deviceTDistanceMonthly",JSON.stringify(data.totalDistance))
-      localStorage.setItem("deviceDistanceMonthly",JSON.stringify(data.dDistance))
+      localStorage.setItem(`${year}${month}deviceTDistanceMonthly`,JSON.stringify(data.totalDistance))
+      localStorage.setItem(`${year}${month}deviceDistanceMonthly`,JSON.stringify(data.dDistance))
     },
   });
+}
 
-  </script>
-  </html>
+</script>
+</html>

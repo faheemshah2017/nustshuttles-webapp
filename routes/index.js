@@ -36,23 +36,21 @@ saveLogs = (message) => {
 
 /* GET home page. */
 router.get("/", authUser, function (req, res, next) {
-    const date = new Date();
     data = {
       page: "dashboard",
       title: "Nust Shuttles",
       plugins: [],
       user: req.user,
-      month: date.toLocaleDateString("en", { month: "short" }),
-      year: date.getFullYear(),
+      // month: date.toLocaleDateString("en", { month: "short" }),
     };
     res.render("index", data);
 });
 
-router.get("/getSummaryMonthly", authUser, function (req, res, next) {
+router.get("/getSummaryMonthly/:year/:month", authUser, function (req, res, next) {
   data_model.getSummaryMonthly(
     col_shuttlesData,
-    getCurrentYear(),
-    getCurrentMonth(),
+    parseInt(req.params.year),
+    parseInt(req.params.month),
     (r) => {
       let avg_speed = 0;
       let top_speed = 0;
@@ -77,11 +75,11 @@ router.get("/getSummaryMonthly", authUser, function (req, res, next) {
   );
 });
 
-router.get("/getIdleTimeMonthly", authUser, function (req, res, next) {
+router.get("/getIdleTimeMonthly/:year/:month", authUser, function (req, res, next) {
   data_model.getIdleTimeMonthly(
     col_shuttlesData,
-    getCurrentYear(),
-    getCurrentMonth(),
+    parseInt(req.params.year),
+    parseInt(req.params.month),
     (idle) => {
       data = {
         idleTime: idle,
@@ -91,11 +89,11 @@ router.get("/getIdleTimeMonthly", authUser, function (req, res, next) {
   );
 });
 
-router.get("/getlatlngByMonth", authUser, function (req, res, next) {
+router.get("/getlatlngByMonth/:year/:month", authUser, function (req, res, next) {
   data_model.getlatlngByMonth(
     col_shuttlesData,
-    getCurrentYear(),
-    getCurrentMonth(),
+    parseInt(req.params.year),
+    parseInt(req.params.month),
     (d) => {
       const groupByDevice = d.reduce((group, data) => {
         const { deviceId } = data;
