@@ -135,7 +135,7 @@ router.post('/sendLocation', (req, res, next) => {
           },
           "message":`Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
         }
-        if(shuttleData.speed>40){
+        if(shuttleData.speed>10){
           console.log(alertData)
           data_model.add(col_alerts, alertData, (resp) => {});
         }
