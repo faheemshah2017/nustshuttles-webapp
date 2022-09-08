@@ -86,7 +86,7 @@ router.post('/sendLocation', (req, res, next) => {
     datetime:new Date(parseInt(req.body.time)*1000)
   }  
   const dataDate = new Date(shuttleData.time * 1000);
-  let hours = dataDate.getHours()+5;
+  let hours = dataDate.getHours();
   let minutes = dataDate.getMinutes();
   let day = dataDate.getDay()
   time = hours+(minutes/100)
