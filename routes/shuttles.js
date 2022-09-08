@@ -95,6 +95,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("setting shuttlesStates variable for shuttle#"+req.body.deviceId)
     shuttlesStates[req.body.deviceId] = 0
   }
+  console.log(time)
   if((time>17.00||time<8.30||day>5)&&shuttleData.speed==0){
     console.log("its off time")
     shuttleData.idleTime = 0;
@@ -135,7 +136,7 @@ router.post('/sendLocation', (req, res, next) => {
           },
           "message":`Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
         }
-        if(shuttleData.speed>10){
+        if(shuttleData.speed>40){
           console.log(alertData)
           data_model.add(col_alerts, alertData, (resp) => {});
         }
