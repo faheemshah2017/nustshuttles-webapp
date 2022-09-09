@@ -100,7 +100,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
-    updateTracking(req,shuttleData)
+    updateTracking(req,res,shuttleData)
   }
   else{
     if(shuttleData.speed==0){
@@ -127,12 +127,12 @@ router.post('/sendLocation', (req, res, next) => {
     }  
     console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
-        updateTracking(req,shuttleData)
+        updateTracking(req,res,shuttleData)
     })
   }
 })
 
-function updateTracking(req,shuttleData){
+function updateTracking(req,res,shuttleData){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
     alertData = {
       "time":new Date(parseInt(req.body.time)*1000),
