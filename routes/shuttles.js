@@ -100,6 +100,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
+    updateTracking(req)
   }
   else{
     if(shuttleData.speed==0){
@@ -126,44 +127,48 @@ router.post('/sendLocation', (req, res, next) => {
     }  
     console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
-      data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
-        alertData = {
-          "time":new Date(parseInt(req.body.time)*1000),
-          "shuttleNumber": shuttle.shuttleNumber,
-          "speed":req.body.speed,
-          "location":{
-            type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
-          },
-          "message":`Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
-        }
-        if(shuttleData.speed>40){
-          console.log(alertData)
-          data_model.add(col_alerts, alertData, (resp) => {});
-        }
-        let data = {
-          deviceId:req.body.deviceId,
-          busNumber:shuttle.shuttleNumber,
-          latitude:req.body.latitude,
-          logitude:req.body.longitude,
-          speed:req.body.speed,
-          time:req.body.time
-        }
-        if(shuttle){
-          try{
-            const child = ref.child(req.body.deviceId)
-            await child.update(data);
-          }
-          catch(e){
-            console.log(e)
-          }
-        }
-        delete req.body._id;
-        data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
-          res.send(resp)
-        })
-      })
+        updateTracking(req)
     })
   }
 })
+
+function updateTracking(req){
+  data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
+    alertData = {
+      "time":new Date(parseInt(req.body.time)*1000),
+      "shuttleNumber": shuttle.shuttleNumber,
+      "speed":req.body.speed,
+      "location":{
+        type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
+      },
+      "message":`Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
+    }
+    if(shuttleData.speed>40){
+      console.log(alertData)
+      data_model.add(col_alerts, alertData, (resp) => {});
+    }
+    let data = {
+      deviceId:req.body.deviceId,
+      busNumber:shuttle.shuttleNumber,
+      latitude:req.body.latitude,
+      logitude:req.body.longitude,
+      speed:req.body.speed,
+      time:req.body.time
+    }
+    if(shuttle){
+      try{
+        const child = ref.child(req.body.deviceId)
+        await child.update(data);
+      }
+      catch(e){
+        console.log(e)
+      }
+    }
+    delete req.body._id;
+    data_model.updateBy(col_tracking, "deviceId", req.body.deviceId, req.body, (resp) => {
+      res.send(resp)
+    })
+  })
+}
 
 module.exports = router;
