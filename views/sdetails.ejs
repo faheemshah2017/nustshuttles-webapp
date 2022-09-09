@@ -178,6 +178,7 @@
               </div>
               <!---Container Fluid-->
           </div>
+          <%- include('./partials/plugins') %>
           <!-- Footer -->
           <%- include('./partials/footer') %>
             <!-- Footer -->
@@ -190,12 +191,7 @@
     </a>
 
 
-    <%- include('./partials/plugins') %>
   </body>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
   <script>
   allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;

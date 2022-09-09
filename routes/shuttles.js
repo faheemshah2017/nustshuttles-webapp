@@ -95,7 +95,6 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("setting shuttlesStates variable for shuttle#"+req.body.deviceId)
     shuttlesStates[req.body.deviceId] = 0
   }
-  console.log(time)
   if((time>17.00||time<8.30||day>5)&&shuttleData.speed==0){
     console.log("its off time")
     shuttleData.idleTime = 0;
@@ -110,7 +109,7 @@ router.post('/sendLocation', (req, res, next) => {
         shuttleData.idleTime = 0;
         shuttleData.stoppedTime = 20;
       }
-      else if(shuttlesStates[req.body.deviceId]>300){
+      else if(shuttlesStates[req.body.deviceId]>120){
         console.log("Shuttle is idle")
         shuttleData.idleTime = 20;
         shuttleData.stoppedTime = 0;
@@ -125,7 +124,6 @@ router.post('/sendLocation', (req, res, next) => {
       shuttleData.idleTime = 0;
       shuttleData.stoppedTime = 0;
     }  
-    console.log("saving data for deviceId: "+req.body.deviceId)
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
         updateTracking(req,res,shuttleData)
     })

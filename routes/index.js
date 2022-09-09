@@ -46,6 +46,44 @@ router.get("/", authUser, function (req, res, next) {
     res.render("index", data);
 });
 
+router.get("/alerts", authUser, function (req, res, next) {
+  data_model.getAll(
+    col_alerts,
+    (r) => {
+      
+      data = {
+        page: "alerts",
+        title: "Alerts",
+        plugins: [],
+        user: req.user,
+        data:r
+        // month: date.toLocaleDateString("en", { month: "short" }),
+      };
+      res.render("alerts", data);
+    }
+  );
+});
+
+router.get("/newAlerts", authUser, function (req, res, next) {
+  data_model.getSome(
+    col_alerts,3,
+    (r) => {
+      res.send(r);
+    }
+  );
+});
+
+router.get("/deleteAlert/:id", authUser, function (req, res, next) {
+  data_model.delete(col_alerts,req.params.id,(resp)=>{
+    data_model.getAll(
+      col_alerts,
+      (r) => {
+        res.send(r);
+      }
+    );
+  })
+});
+
 router.get("/getSummaryMonthly/:year/:month", authUser, function (req, res, next) {
   data_model.getSummaryMonthly(
     col_shuttlesData,

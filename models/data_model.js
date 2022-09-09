@@ -12,6 +12,21 @@ var data_model = {
       });
     });
   },
+  getSome: function (collection,limit, callback) {
+    var query = {};
+
+    collection.find(query).count(function (err, count) {
+      if (err) throw err;
+
+      collection.find(query)
+      .sort({ _id: -1 })
+      .limit(limit).toArray(function (err, result) {
+        if (err) throw err;
+
+        return callback(result);
+      });
+    });
+  },
   get: function (collection, id, callback) {
     var query = {
       _id: new ObjectId(id),

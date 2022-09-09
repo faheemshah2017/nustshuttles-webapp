@@ -83,7 +83,7 @@ router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
         data = {
           page: "analytics",
           title: "Shuttle#"+req.params.shuttlenumber+" | Analytics",
-          plugins: [],
+          plugins: ["charts"],
           user: req.user,
           avg_speed: avg_speed,
           top_speed: top_speed,
