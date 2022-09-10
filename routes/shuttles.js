@@ -136,8 +136,8 @@ function updateTracking(req,res,shuttleData,time){
     console.log(shuttle.route)
     
     let selectedRoute = shuttle.route.find(r=>{
-      r.from = parseFloat(r.from.replece(":","."))
-      r.to = parseFloat(r.to.replece(":","."))
+      r.from = parseFloat(r.from.replaceAll(":","."))
+      r.to = parseFloat(r.to.replaceAll(":","."))
       console.log(r.from,time)
       console.log(r.to,time)
       return (r.from<time&&r.to>time)
