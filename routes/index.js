@@ -39,7 +39,7 @@ router.get("/", authUser, function (req, res, next) {
     data = {
       page: "dashboard",
       title: "Nust Shuttles",
-      plugins: [],
+      plugins: ['charts'],
       user: req.user,
       // month: date.toLocaleDateString("en", { month: "short" }),
     };

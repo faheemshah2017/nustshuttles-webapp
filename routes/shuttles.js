@@ -99,7 +99,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
-    updateTracking(req,res,shuttleData)
+    updateTracking(req,res,shuttleData,time)
   }
   else{
     if(shuttleData.speed==0){
@@ -125,13 +125,28 @@ router.post('/sendLocation', (req, res, next) => {
       shuttleData.stoppedTime = 0;
     }  
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
-        updateTracking(req,res,shuttleData)
+        updateTracking(req,res,shuttleData,time)
     })
   }
 })
 
-function updateTracking(req,res,shuttleData){
+function updateTracking(req,res,shuttleData,time){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
+    selectedRoute = shuttle.route.find(r=>(r.from<time&&r.to>time))
+    console.log("selectedRoute",selectedRoute)
+    
+    data_model.getDataBy(col_routes, selectedRoute._id, (route) => {
+        console.log("route",route)
+        route.path.forEach(p=> {
+          let dist = distance(
+            p.lat,
+            shuttleData.latitude,
+            p.long,
+            shuttleData.longitude
+          );
+          console.log("dist",dist)
+        });
+    })
     alertData = {
       "time":new Date(parseInt(req.body.time)*1000),
       "shuttleNumber": shuttle.shuttleNumber,
@@ -167,6 +182,32 @@ function updateTracking(req,res,shuttleData){
       res.send(resp)
     })
   })
+}
+
+function distance(lat1, lat2, lon1, lon2) {
+  // The math module contains a function
+  // named toRadians which converts from
+  // degrees to radians.
+  lon1 = (lon1 * Math.PI) / 180;
+  lon2 = (lon2 * Math.PI) / 180;
+  lat1 = (lat1 * Math.PI) / 180;
+  lat2 = (lat2 * Math.PI) / 180;
+
+  // Haversine formula
+  let dlon = lon2 - lon1;
+  let dlat = lat2 - lat1;
+  let a =
+    Math.pow(Math.sin(dlat / 2), 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+
+  let c = 2 * Math.asin(Math.sqrt(a));
+
+  // Radius of earth in kilometers. Use 3956
+  // for miles
+  let r = 6371;
+
+  // calculate the result
+  return c * r;
 }
 
 module.exports = router;
