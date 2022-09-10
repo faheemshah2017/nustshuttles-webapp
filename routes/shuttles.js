@@ -134,8 +134,9 @@ router.post('/sendLocation', (req, res, next) => {
 function updateTracking(req,res,shuttleData,time){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
     console.log(shuttle.route)
-    let selectedRoute = shuttle.route.find(r=>(r.from<"09:25"&&r.to>"09:25"))
+    let selectedRoute = shuttle.route.find(r=>(r.from<time&&r.to>time))
     console.log("selectedRoute",selectedRoute)
+    distanceFromRoute = 0
     if(selectedRoute){
       let distArray = [];
       selectedRoute.path.forEach(p=> {
@@ -148,7 +149,7 @@ function updateTracking(req,res,shuttleData,time){
             distArray.push(dist)
       });
       distArray.sort();
-      console.log(distArray[0]*1000)
+      distanceFromRoute = distArray[0]*1000
     }
     alertData = {
       "time":new Date(parseInt(req.body.time)*1000),
@@ -156,10 +157,16 @@ function updateTracking(req,res,shuttleData,time){
       "speed":req.body.speed,
       "location":{
         type:"Point",coordinates:[parseFloat(req.body.longitude),parseFloat(req.body.latitude)]
-      },
-      "message":`Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
+      }
     }
     if(shuttleData.speed>40){
+      alertData.message = `Shuttle#${shuttle.shuttleNumber} violated the speed limit (speed:${req.body.speed})`
+      console.log(alertData)
+      data_model.add(col_alerts, alertData, (resp) => {});
+    }
+    
+    if(distanceFromRoute>250){
+      alertData.message = `Shuttle#${shuttle.shuttleNumber} violated its route`
       console.log(alertData)
       data_model.add(col_alerts, alertData, (resp) => {});
     }
