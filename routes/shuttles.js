@@ -4,33 +4,6 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
   data_model.getAll(col_shuttles, (shuttles) => {
     data_model.getAll(col_routes, (routes) => {      
-      data_model.getDataBy(col_shuttles,"deviceId", "1207894600", async (shuttle) => {
-      console.log(shuttle.route);
-      shuttleData = {
-        latitude:33.63471603393555,
-        longitude:72.98947143554688
-      }
-      
-    let selectedRoute = shuttle.route.find(r=>{
-      r.from = parseFloat(r.from.replaceAll(":","."))
-      r.to = parseFloat(r.to.replaceAll(":","."))
-      console.log(r.from,'8.45')
-      console.log(r.to,'8.45')
-      return (r.from<'8.45'&&r.to>'8.45')
-    })
-      console.log("selectedRoute",selectedRoute)
-      let distArray = [];
-      selectedRoute.path.forEach(p=> {
-            let dist = distance(
-              p.lat,
-              shuttleData.latitude,
-              p.lng,
-              shuttleData.longitude
-            );
-            distArray.push(dist)
-      });
-      distArray.sort();
-      console.log(distArray[0]*1000)
       data = {
         page: 'shuttles',
         title: 'Nust Shuttles',
@@ -41,7 +14,6 @@ router.get('/', function (req, res, next) {
       }
       res.render('shuttles', data);
     })
-  })
   })
 });
 
