@@ -161,17 +161,11 @@ router.post('/sendLocation', (req, res, next) => {
 
 function updateTracking(req,res,shuttleData,time){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
-    console.log(shuttle.route)
-    
     let selectedRoute = shuttle.route.find(r=>{
-      console.log(typeof(r.from))
       r.from = parseFloat(r.from.split(":").join("."))
       r.to = parseFloat(r.to.split(":").join("."))
-      console.log(r.from,time)
-      console.log(r.to,time)
       return (r.from<time&&r.to>time)
     })
-    console.log("selectedRoute",selectedRoute)
     distanceFromRoute = 0
     if(selectedRoute){
       let distArray = [];
@@ -187,6 +181,7 @@ function updateTracking(req,res,shuttleData,time){
       distArray.sort();
       distanceFromRoute = distArray[0]*1000
     }
+    console.log(distanceFromRoute)
     alertData = {
       "time":new Date(parseInt(req.body.time)*1000),
       "shuttleNumber": shuttle.shuttleNumber,
