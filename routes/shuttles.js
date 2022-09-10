@@ -134,7 +134,14 @@ router.post('/sendLocation', (req, res, next) => {
 function updateTracking(req,res,shuttleData,time){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
     console.log(shuttle.route)
-    let selectedRoute = shuttle.route.find(r=>(r.from<time&&r.to>time))
+    
+    let selectedRoute = shuttle.route.find(r=>{
+      r.from = parseFloat(r.from.replece(":","."))
+      r.to = parseFloat(r.to.replece(":","."))
+      console.log(r.from,time)
+      console.log(r.to,time)
+      return (r.from<time&&r.to>time)
+    })
     console.log("selectedRoute",selectedRoute)
     distanceFromRoute = 0
     if(selectedRoute){
