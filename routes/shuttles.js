@@ -168,7 +168,7 @@ function updateTracking(req,res,shuttleData,time){
       data_model.add(col_alerts, alertData, (resp) => {});
     }
     
-    if(distanceFromRoute>250){
+    if(distanceFromRoute>150){
       alertData.message = `Shuttle#${shuttle.shuttleNumber} violated its route`
       console.log(alertData)
       data_model.add(col_alerts, alertData, (resp) => {});
