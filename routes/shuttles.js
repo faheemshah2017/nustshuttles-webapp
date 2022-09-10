@@ -95,7 +95,8 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("setting shuttlesStates variable for shuttle#"+req.body.deviceId)
     shuttlesStates[req.body.deviceId] = 0
   }
-  if((time>17.00||time<8.30||day>5)&&shuttleData.speed==0){
+  //||day>5
+  if((time>17.00||time<8.30)&&shuttleData.speed==0){
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
