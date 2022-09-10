@@ -31,14 +31,16 @@ var data_model = {
     var query = {
       _id: new ObjectId(id),
     };
+    console.log(query)
 
     collection.find(query).count(function (err, count) {
+      console.log(count)
       if (err) throw err;
 
-      collection.findOne(query).toArray(function (err, result) {
+      collection.find(query).toArray(function (err, result) {
         if (err) throw err;
 
-        return callback(result);
+        return callback(result[0]);
       });
     });
   },
