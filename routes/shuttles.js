@@ -99,7 +99,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
-    updateTracking(req,res,shuttleData,time)
+    updateTracking(req,res,shuttleData,time,false)
   }
   else{
     if(shuttleData.speed==0){
@@ -125,12 +125,12 @@ router.post('/sendLocation', (req, res, next) => {
       shuttleData.stoppedTime = 0;
     }  
     data_model.add(col_shuttlesData, shuttleData, (resp) => {
-        updateTracking(req,res,shuttleData,time)
+        updateTracking(req,res,shuttleData,time,true)
     })
   }
 })
 
-function updateTracking(req,res,shuttleData,time){
+function updateTracking(req,res,shuttleData,time,routeCheck){
   data_model.getDataBy(col_shuttles,"deviceId", req.body.deviceId, async (shuttle) => {
     let selectedRoute = shuttle.route.find(r=>{
       r.from = parseFloat(r.from.split(":").join("."))
@@ -167,7 +167,7 @@ function updateTracking(req,res,shuttleData,time){
       data_model.add(col_alerts, alertData, (resp) => {});
     }
     
-    if(distanceFromRoute>200){
+    if(distanceFromRoute>200&&routeCheck){
       alertData.message = `Shuttle#${shuttle.shuttleNumber} violated its route`
       console.log(alertData)
       data_model.add(col_alerts, alertData, (resp) => {});
