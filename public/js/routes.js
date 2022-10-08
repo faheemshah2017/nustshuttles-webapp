@@ -274,10 +274,13 @@ function selectRoute(routeID) {
       stopName = `${i}`;
       color = "#224879"
       size = 5;
+      pointType = "point"
+      console.log(fpc)
       if(fpc.point){
         stopName = fpc.point;
         color = "orange";
         size = 7
+        pointType = "stop"
       }
       marker[i] = new google.maps.Marker({
         map: map,
@@ -294,9 +297,16 @@ function selectRoute(routeID) {
         title: stopName
       });
       marker[i].addListener("click", () => {
-        document.getElementById("stopId").value = marker[i].title;
+        document.getElementById("stopId").value = marker[i].get("id");
+        if(!isNumeric(marker[i].title)){
+          document.getElementById("stopName").value = marker[i].title;
+        }
+        else{
+          document.getElementById("stopName").value = "";
+        }
         $('#addStopModal').modal('show');
       });
+      marker[i].setValues({type: pointType, id: i});
     })
   }
 
@@ -305,6 +315,10 @@ function selectRoute(routeID) {
   } catch (e) {}
   flightPath[routeID].setMap(map);
   lastRoute = routeID;
+}
+
+function isNumeric(value) {
+  return /^-?\d+$/.test(value);
 }
 
 function submitRoute() {
@@ -459,6 +473,7 @@ function confirmDelete(route) {
 }
 
 function submitStop() {
+  debugger
   var values = {};
   $.each($("#stop_form").serializeArray(), function (i, field) {
     values[field.name] = field.value;
@@ -467,7 +482,12 @@ function submitStop() {
   selectedRouteId = document.getElementById("selectedRoute").value;
   selectedRoute = routes.find((r) => r._id == selectedRouteId);
   selectedRoutePath = selectedRoute.path[parseInt(values.stopId)]
-  selectedRoutePath.point = values.stopName;
+  if(values.stopName==""){
+    delete selectedRoutePath.point;
+  }
+  else{
+    selectedRoutePath.point = values.stopName;
+  }
   selectedRoute.path[parseInt(values.stopId)] = selectedRoutePath;
   
   delete selectedRoute.rowId;

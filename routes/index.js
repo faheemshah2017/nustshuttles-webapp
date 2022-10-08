@@ -47,8 +47,8 @@ router.get("/", authUser, function (req, res, next) {
 });
 
 router.get("/alerts", authUser, function (req, res, next) {
-  data_model.getAll(
-    col_alerts,
+  data_model.getSome(
+    col_alerts,100,
     (r) => {
       
       data = {

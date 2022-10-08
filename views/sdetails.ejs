@@ -1,6 +1,28 @@
 <%- include('./partials/header') %>
 
   <body id="page-top">
+    <style>
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 3px solid #ffa426!important;
+      width: 20px;
+      height: 20px;
+      -webkit-animation: spin 1s linear infinite; /* Safari */
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style>
     <div id="wrapper">
       <!-- Sidebar -->
       <%- include('./partials/sidebar') %>
@@ -14,8 +36,36 @@
               <!-- Container Fluid-->
               <div class="container-fluid" id="container-wrapper">
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                  <h1 class="h3 mb-0 text-gray-800">Shuttle#<%=shuttle%></h1>
-                  <h1 class="h3 mb-0 text-gray-800 float-right" id="duration"><%=month%>-<%=year%></h1>
+                  
+                  <h1 class="h3 mb-0 text-gray-800">Shuttle#<%=shuttle%>
+                    <button onclick="syncData()" id="syncDataBtn" class="btn btn-primary" style="height: 41px;margin-top: 1px;"> &#x27f3; Sync</button>
+                  </h1>
+                  <div class="row">
+                    <div class="col-md-5">
+                      <select class="form-control" style="width: 80px;" onchange="monthSelected(this)" id="month">
+                        <option value="1">Jan</option>
+                        <option value="2">Feb</option>
+                        <option value="3">Mar</option>
+                        <option value="4">Apr</option>
+                        <option value="5">May</option>
+                        <option value="6">Jun</option>
+                        <option value="7">Jul</option>
+                        <option value="8">Aug</option>
+                        <option value="9">Sep</option>
+                        <option value="10">Oct</option>
+                        <option value="11">Nov</option>
+                        <option value="12">Dec</option>
+                      </select> 
+                    </div>
+                    <div class="col-md-7">
+                      <select class="form-control" onchange="yearSelected(this)" id="year">
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                      </select> 
+                    </div>
+                  </div>
                 </div>
                 <div class="row mb-3">
                   <!-- Earnings (Monthly) Card Example -->
@@ -25,7 +75,7 @@
                         <div class="row align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Top Speed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=top_speed%> kph</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="topSpeed">0 kph</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span> -->
                               <span>This Month</span>
@@ -45,7 +95,7 @@
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Avg Speed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=avg_speed%> kph</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgSpeed">0 kph</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span> -->
                               <span>This Month</span>
@@ -65,7 +115,7 @@
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Mileage</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%=totalDistance%> km</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalDistance">0 km</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span> -->
                               <span>This Month</span>
@@ -194,98 +244,98 @@
   </body>
 
   <script>
-  allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;
-  dailyDistance = <%- JSON.stringify(dailyDistance); %>;
-  month = <%- JSON.stringify(month); %>;
-let allshuttles = [];
-let dataSeriesAvgTop = [
-  {
-    name: "Avg",
-    data: [],
-  },
-  {
-    name: "Top",
-    data: [],
-  },
-];
+  shuttle = <%- JSON.stringify(shuttle); %>;
+  deviceId = <%- JSON.stringify(deviceId); %>;
+// let allshuttles = [];
+// let dataSeriesAvgTop = [
+//   {
+//     name: "Avg",
+//     data: [],
+//   },
+//   {
+//     name: "Top",
+//     data: [],
+//   },
+// ];
 
-// allShuttlesSum.sort((a, b) =>
-//   a._id.day.localeCompare(b._id.day)
-// );
+// // allShuttlesSum.sort((a, b) =>
+// //   a._id.day.localeCompare(b._id.day)
+// // );
 
-allShuttlesSum.sort((a, b)=>{return a._id.day - b._id.day})
+// allShuttlesSum.sort((a, b)=>{return a._id.day - b._id.day})
 
-speeds = '';
-allShuttlesSum.forEach((s) => {
-  allshuttles.push(s._id.day+"-"+month);
-  dataSeriesAvgTop[0].data.push(s.avg_speed);
-  dataSeriesAvgTop[1].data.push(s.top_speed);
-  i = Math.floor((Math.random() * 5) + 1)
-  let dd = dailyDistance[s._id.day]
-  dd=dd??0;
-  let color = 'bg-success';
-    if((dd/2)>50){
-      color = 'bg-warning'
-    }
-    if((dd/2)>80){
-      color = 'bg-danger'
-    }
+// speeds = '';
+// allShuttlesSum.forEach((s) => {
+//   allshuttles.push(s._id.day+"-"+month);
+//   dataSeriesAvgTop[0].data.push(s.avg_speed);
+//   dataSeriesAvgTop[1].data.push(s.top_speed);
+//   i = Math.floor((Math.random() * 5) + 1)
+//   let dd = dailyDistance[s._id.day]
+//   dd=dd??0;
+//   let color = 'bg-success';
+//     if((dd/2)>50){
+//       color = 'bg-warning'
+//     }
+//     if((dd/2)>80){
+//       color = 'bg-danger'
+//     }
 
-    speeds += `
-    <div class="mb-3">
-      <div class="small text-gray-500">${s._id.day}-${month}
-        <div class="small float-right"><b>${dd} km</b></div>
-      </div>
-      <div class="progress" style="height: 12px;">
-        <div class="progress-bar ${color}" role="progressbar" style="width: ${dd/2}%"
-          aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-    </div>`
-});
-$(document).ready(function () {
-  $("#mileage").append(speeds);
-});
+//     speeds += `
+//     <div class="mb-3">
+//       <div class="small text-gray-500">${s._id.day}-${month}
+//         <div class="small float-right"><b>${dd} km</b></div>
+//       </div>
+//       <div class="progress" style="height: 12px;">
+//         <div class="progress-bar ${color}" role="progressbar" style="width: ${dd/2}%"
+//           aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+//       </div>
+//     </div>`
+// });
+// $(document).ready(function () {
+//   $("#mileage").append(speeds);
+// });
 
-Highcharts.chart("avg-top-speed", {
-  chart: {
-    type: "column",
-  },
-  title: {
-    text: "",
-  },
-  // subtitle: {
-  //     text: 'All Shuttles'
-  // },
-  xAxis: {
-    categories: allshuttles,
-    crosshair: true,
-  },
-  yAxis: {
-    min: 0,
-    title: {
-      text: "Speed (kph)",
-    },
-  },
-  tooltip: {
-    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-    pointFormat:
-      '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-      '<td style="padding:0"><b>{point.y:.1f} kph</b></td></tr>',
-    footerFormat: "</table>",
-    shared: true,
-    useHTML: true,
-  },
-  plotOptions: {
-    column: {
-      pointPadding: 0.2,
-      borderWidth: 0,
-    },
-  },
-  credits: {
-    enabled: false,
-  },
-  series: dataSeriesAvgTop,
-});
+// Highcharts.chart("avg-top-speed", {
+//   chart: {
+//     type: "column",
+//   },
+//   title: {
+//     text: "",
+//   },
+//   // subtitle: {
+//   //     text: 'All Shuttles'
+//   // },
+//   xAxis: {
+//     categories: allshuttles,
+//     crosshair: true,
+//   },
+//   yAxis: {
+//     min: 0,
+//     title: {
+//       text: "Speed (kph)",
+//     },
+//   },
+//   tooltip: {
+//     headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+//     pointFormat:
+//       '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+//       '<td style="padding:0"><b>{point.y:.1f} kph</b></td></tr>',
+//     footerFormat: "</table>",
+//     shared: true,
+//     useHTML: true,
+//   },
+//   plotOptions: {
+//     column: {
+//       pointPadding: 0.2,
+//       borderWidth: 0,
+//     },
+//   },
+//   credits: {
+//     enabled: false,
+//   },
+//   series: dataSeriesAvgTop,
+// });
   
   </script>
+  <script src="/js/sDetails.js"></script>
   </html>

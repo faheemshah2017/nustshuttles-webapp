@@ -48,57 +48,123 @@ router.get("/", authUser, function (req, res, next) {
   });
 });
 
-router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
-  data_model.shuttlelatlngByMonth(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (d) => {
-    data_model.getDeviceSummaryMonthly(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (r) => {
-      const groupByDay = d.reduce((group, data) => {
-        const { day } = data;
-        group[day] = group[day] ?? [];
-        group[day].push(data);
-        return group;
-      }, {});
-      let days = Object.keys(groupByDay);
-      let totalDistance = 0;
-      let dailyDistance = {}
-      if (days.length > 1) {
-        days.forEach((d) => {
-          let daysArray = groupByDay[d];
-          let distance = calculateTotalDistance(daysArray);
-          totalDistance += distance;
-          dailyDistance[daysArray[0].day] = Math.round(distance)
-        });
-      }
-      let avg_speed = 0;
-      let top_speed = 0;
-      let top_speed_bus = "";
-      r.forEach((e) => {
-        avg_speed += e.avg_speed;
-        if (e.top_speed > top_speed) {
-          top_speed = e.top_speed;
-          top_speed_bus = e._id.shuttleNumber;
-        }
+router.get("/shuttlelatlngByMonth/:deviceid/:year/:month",authUser,function(req,res,next){
+  data_model.shuttlelatlngByMonth(col_shuttlesData,req.params.deviceid,parseInt(req.params.year),parseInt(req.params.month), (d) => {
+    console.log(d)
+    const groupByDay = d.reduce((group, data) => {
+      const { day } = data;
+      group[day] = group[day] ?? [];
+      group[day].push(data);
+      return group;
+    }, {});
+    let days = Object.keys(groupByDay);
+    let totalDistance = 0;
+    let dailyDistance = {}
+    if (days.length > 1) {
+      days.forEach((d) => {
+        let daysArray = groupByDay[d];
+        let distance = calculateTotalDistance(daysArray);
+        totalDistance += distance;
+        dailyDistance[daysArray[0].day] = Math.round(distance)
       });
-      const date = new Date();
-      avg_speed = Math.round(avg_speed / r.length);
+    }
+    data = {
+      totalDistance: Math.round(totalDistance),
+      dailyDistance: dailyDistance,
+    };
+      res.send(data)
+  })
+})
+
+router.get("/getDeviceSummaryMonthly/:deviceid/:year/:month",authUser,function(req,res,next){
+  data_model.getDeviceSummaryMonthly(col_shuttlesData,req.params.deviceid,parseInt(req.params.year),parseInt(req.params.month), (r) => {
+    let avg_speed = 0;
+    let top_speed = 0;
+    let top_speed_bus = "";
+    r.forEach((e) => {
+      avg_speed += e.avg_speed;
+      if (e.top_speed > top_speed) {
+        top_speed = e.top_speed;
+        top_speed_bus = e._id.shuttleNumber;
+      }
+    });
+    
+    avg_speed = Math.round(avg_speed / r.length);
+    
+    data = {
+      avg_speed: avg_speed,
+      top_speed: top_speed,
+      top_speed_bus: req.params.shuttlenumber,
+      allShuttlesSum:r
+    };
+      res.send(data)
+  })
+})
+
+router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
         data = {
           page: "analytics",
           title: "Shuttle#"+req.params.shuttlenumber+" | Analytics",
           plugins: ["charts"],
           user: req.user,
-          avg_speed: avg_speed,
-          top_speed: top_speed,
-          top_speed_bus: req.params.shuttlenumber,
-          allShuttlesSum: r,
           shuttle:req.params.shuttlenumber,
-          totalDistance: Math.round(totalDistance),
-          dailyDistance: dailyDistance,
-          month:date.toLocaleDateString("en", {month: "short"}),
-          year:date.getFullYear()
+          deviceId:req.params.deviceid
         };
-        res.render("sdetails", data);
-    });
-  });
+      res.render("sdetails", data);
 });
+
+
+// router.get("/:deviceid/:shuttlenumber", authUser, function (req, res, next) {
+//   data_model.shuttlelatlngByMonth(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (d) => {
+//     data_model.getDeviceSummaryMonthly(col_shuttlesData,req.params.deviceid,getCurrentYear(),getCurrentMonth(), (r) => {
+//       const groupByDay = d.reduce((group, data) => {
+//         const { day } = data;
+//         group[day] = group[day] ?? [];
+//         group[day].push(data);
+//         return group;
+//       }, {});
+//       let days = Object.keys(groupByDay);
+//       let totalDistance = 0;
+//       let dailyDistance = {}
+//       if (days.length > 1) {
+//         days.forEach((d) => {
+//           let daysArray = groupByDay[d];
+//           let distance = calculateTotalDistance(daysArray);
+//           totalDistance += distance;
+//           dailyDistance[daysArray[0].day] = Math.round(distance)
+//         });
+//       }
+//       let avg_speed = 0;
+//       let top_speed = 0;
+//       let top_speed_bus = "";
+//       r.forEach((e) => {
+//         avg_speed += e.avg_speed;
+//         if (e.top_speed > top_speed) {
+//           top_speed = e.top_speed;
+//           top_speed_bus = e._id.shuttleNumber;
+//         }
+//       });
+//       const date = new Date();
+//       avg_speed = Math.round(avg_speed / r.length);
+//         data = {
+//           page: "analytics",
+//           title: "Shuttle#"+req.params.shuttlenumber+" | Analytics",
+//           plugins: ["charts"],
+//           user: req.user,
+//           avg_speed: avg_speed,
+//           top_speed: top_speed,
+//           top_speed_bus: req.params.shuttlenumber,
+//           allShuttlesSum: r,
+//           shuttle:req.params.shuttlenumber,
+//           totalDistance: Math.round(totalDistance),
+//           dailyDistance: dailyDistance,
+//           month:date.toLocaleDateString("en", {month: "short"}),
+//           year:date.getFullYear()
+//         };
+//         res.render("sdetails", data);
+//     });
+//   });
+// });
 
 function distance(lat1, lat2, lon1, lon2) {
   // The math module contains a function

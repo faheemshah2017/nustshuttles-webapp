@@ -41,6 +41,22 @@
                 "useUnifiedTopology": true
             }
         },
+        "liveDBNust":{
+            "type": "mongo",
+            "hostname":"cluster0.j08zgq9.mongodb.net",
+            "host": "localhost",
+            "port": "27017",
+            "username": "faheemshah",
+            "password": "Nust@123",
+            "dbName": "nustshuttles",
+            "authMechanism": "DEFAULT",
+            "options": {
+                "poolSize": 10,
+                "bufferMaxEntries": 0,
+                "useNewUrlParser": true,
+                "useUnifiedTopology": true
+            }
+        },
         "liveDB":{
             "type": "mongo",
             "hostname":"cluster0.dgjb4.mongodb.net",
@@ -57,5 +73,6 @@
                 "useUnifiedTopology": true
             }
         }
+
     }
 }
