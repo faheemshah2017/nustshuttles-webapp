@@ -178,7 +178,8 @@ function updateTracking(req,res,shuttleData,time,routeCheck){
       latitude:req.body.latitude,
       logitude:req.body.longitude,
       speed:req.body.speed,
-      time:req.body.time
+      time:req.body.time,
+      ...(req.body.speed !== "0" && { lastActiveTime: req.body.time+"000" })
     }
     if(shuttle){
       try{
