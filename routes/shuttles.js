@@ -179,7 +179,31 @@ function updateTracking(req,res,shuttleData,time,routeCheck){
       logitude:req.body.longitude,
       speed:req.body.speed,
       time:req.body.time,
-      ...(req.body.speed !== "0" && { lastActiveTime: req.body.time+"000" })
+      lastActiveTime:`${Date.now()}`
+    }
+
+    const current_time_in_milliseconds = Date.now();
+
+    // Check if the speed is not zero
+    if (data.speed !== "0") {
+      data.activeStatus = "active";
+      req.body.lastActiveTime = current_time_in_milliseconds;
+      data.lastActiveTime = "0";
+    } else {
+      const lastActiveTime = Date.now();
+      // The last active time from  data source
+      if(shuttle.lastActiveTime){
+        lastActiveTime = parseInt(shuttle.lastActiveTime);
+        data.lastActiveTime = shuttle.lastActiveTime
+      }
+    
+      // Set the status to inactive initially
+      data.activeStatus = "inactive";
+    
+      // If it's been more than 5 minutes since the last active time, set the status to stop
+      if (current_time_in_milliseconds - lastActiveTime > 300000) {
+        data.activeStatus = "stop";
+      }
     }
     if(shuttle){
       try{
