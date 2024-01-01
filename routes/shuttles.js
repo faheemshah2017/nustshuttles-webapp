@@ -182,30 +182,20 @@ function updateTracking(req,res,shuttleData,time,routeCheck){
       lastActiveTime:`${Date.now()}`
     }
 
-    const current_time_in_milliseconds = Date.now();
-
     // Check if the speed is not zero
     if (data.speed !== "0") {
       data.activeStatus = "active";
-      req.body.lastActiveTime = current_time_in_milliseconds;
-      data.lastActiveTime = "0";
+      req.body.lastActiveTime = Date.now();
     } else {
-      const lastActiveTime = Date.now();
-      // The last active time from  data source
-      if(shuttle.lastActiveTime){
-        lastActiveTime = parseInt(shuttle.lastActiveTime);
-        data.lastActiveTime = shuttle.lastActiveTime
-      }
-    
       // Set the status to inactive initially
       data.activeStatus = "inactive";
-    
       // If it's been more than 5 minutes since the last active time, set the status to stop
-      if (current_time_in_milliseconds - lastActiveTime > 300000) {
+      if(shuttlesStates[req.body.deviceId]==300){
+        console.log("setting stop")
         data.activeStatus = "stop";
       }
     }
-    if(shuttle){
+    if(shuttle&&(shuttlesStates[req.body.deviceId]==300||shuttlesStates[req.body.deviceId]==20||data.speed !== "0")){
       try{
         const child = ref.child(req.body.deviceId)
         await child.update(data);
