@@ -77,18 +77,18 @@ router.get('/details/:user_id', authUser, function (req, res, next) {
 
 });
 
-router.post('/register', function (req, res) {
-  data_model.getBy(col_users, "email", req.body.email, (getResp) => {
-    if (!getResp) {
-      user_model.addUser(req.body, req.body.password, function (saveResp) {
-        res.send(saveResp)
-      })
-    }
-    else {
-      res.send(false)
-    }
-  })
-});
+// router.post('/register', function (req, res) {
+//   data_model.getBy(col_users, "email", req.body.email, (getResp) => {
+//     if (!getResp) {
+//       user_model.addUser(req.body, req.body.password, function (saveResp) {
+//         res.send(saveResp)
+//       })
+//     }
+//     else {
+//       res.send(false)
+//     }
+//   })
+// });
 
 router.post('/forgot_pass', function(req, res) {
     user_model.getUserByEmail(req.body.email,(user)=>{

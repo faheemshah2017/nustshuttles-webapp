@@ -200,13 +200,13 @@ router.get("/login", function (req, res, next) {
   res.render("login", data);
 });
 
-router.get("/register", function (req, res, next) {
-  data = {
-    title: "Register | Nust Shuttles",
-    plugins: [],
-  };
-  res.render("register", data);
-});
+// router.get("/register", function (req, res, next) {
+//   data = {
+//     title: "Register | Nust Shuttles",
+//     plugins: [],
+//   };
+//   res.render("register", data);
+// });
 
 router.post("/shuttleLocation", function (req, res, next) {
   data_model.add(col_shuttles, req.body, (resp) => {
