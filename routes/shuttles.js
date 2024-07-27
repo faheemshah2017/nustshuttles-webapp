@@ -85,11 +85,14 @@ router.post('/sendLocation', (req, res, next) => {
     },
     datetime:new Date(parseInt(req.body.time)*1000)
   }  
-  const dataDate = new Date(shuttleData.time * 1000);
+  const dataDate = new Date();
+console.log("shuttle time",shuttleData.time)
   let hours = dataDate.getHours();
   let minutes = dataDate.getMinutes();
   let day = dataDate.getDay()
   time = hours+(minutes/100)
+console.log("time is ",dataDate);
+console.log("speed is",shuttleData.speed);
   console.log("data received from deviceId: "+req.body.deviceId)
   if(!shuttlesStates[req.body.deviceId]){
     console.log("setting shuttlesStates variable for shuttle#"+req.body.deviceId)
@@ -99,6 +102,7 @@ router.post('/sendLocation', (req, res, next) => {
     console.log("its off time")
     shuttleData.idleTime = 0;
     shuttleData.stoppedTime = 0;
+    shuttlesStates[req.body.deviceId]+=20;
     updateTracking(req,res,shuttleData,time,false)
   }
   else{
@@ -178,9 +182,24 @@ function updateTracking(req,res,shuttleData,time,routeCheck){
       latitude:req.body.latitude,
       logitude:req.body.longitude,
       speed:req.body.speed,
-      time:req.body.time
+      time:req.body.time,
+      lastActiveTime:`${Date.now()}`
     }
-    if(shuttle){
+    // Check if the speed is not zero
+    if (data.speed !== "0") {
+      data.activeStatus = "active";
+      req.body.lastActiveTime = Date.now();
+    } else {
+      // Set the status to inactive initially
+      data.activeStatus = "inactive";
+      // If it's been more than 5 minutes since the last active time, set the status to stop
+      if(shuttlesStates[req.body.deviceId]==300){
+        console.log("setting stop")
+        data.activeStatus = "stop";
+      }
+    }
+    if(shuttle&&(shuttlesStates[req.body.deviceId]==300||shuttlesStates[req.body.deviceId]==20||data.speed !== "0")){
+      console.log("sending data to firebase",data)
       try{
         const child = ref.child(req.body.deviceId)
         await child.update(data);

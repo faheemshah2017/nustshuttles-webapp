@@ -100,7 +100,7 @@ const hostname = SysConfig.settings.liveDB.hostname;
 //     }
 // }
 
-DBurl = `mongodb+srv://${user}:${password}@${hostname}/?retryWrites=true&w=majority`;
+DBurl = `mongodb://127.0.0.1:27017/`;
 
 app.use(session({
   key: 'sid',

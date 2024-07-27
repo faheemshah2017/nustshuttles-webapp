@@ -1,0 +1,24 @@
+
+var createError = require('http-errors'); var express = require('express'); var path = require('path'); var cookieParser = require('cookie-parser'); var logger = require('morgan');
+
+
+
+
+
+
+
+
+const MongoClient = require('mongodb').MongoClient; SysConfig = require(appRoot + "/config/sys_config.json"); const user = encodeURIComponent(SysConfig.settings.db.username || ''); const 
+password = encodeURIComponent(SysConfig.settings.db.password || ''); const host = '127.0.0.1'; // Use localhost const port = SysConfig.settings.db.port || 27017; const dbName = 
+SysConfig.settings.db.dbName || 'test'; const authMechanism = SysConfig.settings.db.authMechanism || 'DEFAULT'; var indexRouter = require('./routes/index'); let DBurl; if (user === '' || 
+password === '') { var usersRouter = require('./routes/users'); DBurl = `mongodb://${host}:${port}/`; var shuttlesRouter = require('./routes/shuttles');} else { var routesRouter = 
+require('./routes/routes'); DBurl = `mongodb://${user}:${password}@${host}:${port}/${dbName}?authMechanism=${authMechanism}`; var analyticsRouter = require('./routes/analytics');}
+
+console.log('DB URL:', DBurl); passport = require('passport'); MongoClient.connect(DBurl, function(err, db) { session = require('express-session'); if (err) { var cors = require('cors'); 
+console.error('Failed to connect to the database.');
+    console.error(err); var firebaseAdmin = require("firebase-admin"); return;
+  }
+  console.log("Database connected!"); var flash = require('connect-flash'); db.close(); MongoStore = require('connect-mongo')(session)});
+appRoot = path.resolve(__dirname);
+
+
