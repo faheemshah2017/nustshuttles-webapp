@@ -38,7 +38,8 @@
                 "poolSize": 10,
                 "bufferMaxEntries": 0,
                 "useNewUrlParser": true,
-                "useUnifiedTopology": true
+                "useUnifiedTopology": true,
+                "autoIndex": false
             }
         },
         "liveDBNust":{
