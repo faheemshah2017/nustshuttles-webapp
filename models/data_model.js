@@ -155,6 +155,15 @@ var data_model = {
       return callback(true);
     });
   },
+  deleteAllByQuery: function (collection, query, callback) {
+    collection.deleteMany(query, function (err, obj) {
+      if (err) {
+        throw err;
+      }
+  
+      return callback(true);
+    });
+  },
   deleteAllBy: function (collection, key, value, callback) {
     var query = {
       key: value,

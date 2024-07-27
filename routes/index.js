@@ -84,6 +84,18 @@ router.get("/deleteAlert/:id", authUser, function (req, res, next) {
   })
 });
 
+router.get("/deleteOldData/faheemshah", function (req, res, next) {
+  let lastYearDate = new Date("2022-12-31T00:00:00.000Z");
+  let query = {
+    time: {
+      $lt: lastYearDate,
+    },
+  };
+  data_model.deleteAllByQuery(col_alerts,query,(resp)=>{
+    res.send(resp)
+  })
+});
+
 router.get("/getSummaryMonthly/:year/:month", authUser, function (req, res, next) {
   data_model.getSummaryMonthly(
     col_shuttlesData,
