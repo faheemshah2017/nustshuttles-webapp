@@ -214,6 +214,9 @@ router.post("/shuttleLocation", function (req, res, next) {
   });
 });
 
+//docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=faheemshah -e MONGO_INITDB_ROOT_PASSWORD=faheemmongodb mongo:latest
+//docker run --name mongodb -d -p 27017:27017 -v $(pwd)/data:/data/db -e MONGO_INITDB_ROOT_USERNAME=faheemshah -e MONGO_INITDB_ROOT_PASSWORD=faheemmongodb mongo:latest
+
 router.get("/shuttleData/:id", function (req, res, next) {
   data_model.getAllDataBy(
     col_shuttlesData,
