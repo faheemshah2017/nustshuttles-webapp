@@ -1,6 +1,30 @@
 var express = require('express');
 var router = express.Router();
 
+authUser = function (req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+};
+
+router.get('/status', authUser, function (req, res, next) {
+  data = {
+    page: 'shuttleStatus',
+    title: 'Shuttle Status | Nust Shuttles',
+    plugins: [],
+    user: req.user,
+  };
+  res.render('shuttle_status', data);
+});
+
+router.get('/statusData', authUser, function (req, res, next) {
+  data_model.getLastPingPerShuttle(col_shuttles, col_shuttlesData, (statuses) => {
+    res.send(statuses);
+  });
+});
+
 router.get('/', function (req, res, next) {
   data_model.getAll(col_shuttles, (shuttles) => {
     data_model.getAll(col_routes, (routes) => {      

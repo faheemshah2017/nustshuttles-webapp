@@ -683,6 +683,33 @@ var data_model = {
       return callback(result);
     });
   },
+  getLastPingPerShuttle: function (shuttlesCollection, shuttlesDataCollection, callback) {
+    shuttlesCollection.find({}).toArray(function (err, shuttles) {
+      if (err) throw err;
+      if (!shuttles.length) return callback([]);
+
+      let remaining = shuttles.length;
+      let results = [];
+      shuttles.forEach((shuttle) => {
+        shuttlesDataCollection
+          .find({ deviceId: shuttle.deviceId })
+          .sort({ datetime: -1 })
+          .limit(1)
+          .toArray(function (err, docs) {
+            if (err) throw err;
+            results.push({
+              deviceId: shuttle.deviceId,
+              shuttleNumber: shuttle.shuttleNumber,
+              lastData: docs[0] || null,
+            });
+            remaining--;
+            if (remaining === 0) {
+              callback(results);
+            }
+          });
+      });
+    });
+  },
   getFleetDailyTrendMonthly: function (collection, year, month, callback) {
     const { start, end } = monthRange(year, month);
     const agg = [
