@@ -74,7 +74,7 @@
                         <div class="row align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Top Speed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="topSpeed">0 kph</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="topSpeed">&mdash;</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span> -->
                               <span id="topSpeedShuttle">Shuttle#</span>
@@ -94,7 +94,7 @@
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Avg Speed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgSpeed">0 kph</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgSpeed">&mdash;</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span> -->
                               <span>All Shuttles This Month</span>
@@ -114,7 +114,7 @@
                         <div class="row no-gutters align-items-center">
                           <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Mileage</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalDistance">0 km</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalDistance">&mdash;</div>
                             <div class="mt-2 mb-0 text-muted text-xs">
                               <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span> -->
                               <span>All Shuttles This Month</span>
@@ -122,6 +122,44 @@
                           </div>
                           <div class="col-auto">
                             <i class="fas fa-road fa-2x text-success"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Idle Time Card -->
+                  <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Idle Time</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalIdleTime">&mdash;</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <span>All Shuttles This Month</span>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-fw fa-hourglass-half fa-2x text-secondary"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Busiest Shuttle Card -->
+                  <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Busiest Shuttle</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="busiestShuttle">&mdash;</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                              <span id="busiestShuttleDistance">All Shuttles This Month</span>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <i class="fas fa-fw fa-trophy fa-2x text-info"></i>
                           </div>
                         </div>
                       </div>
@@ -210,6 +248,17 @@
                       </div>
                     </div>
                   </div>
+
+                  <div class="col-xl-12 col-lg-12">
+                    <div class="card mb-4">
+                      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Daily Speed Trend This Month</h6>
+                      </div>
+                      <div class="card-body">
+                        <div id="daily-trend"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <!--Row-->
 
@@ -256,6 +305,7 @@
   <script>
   
 let allshuttles = [];
+let idleshuttles = [];
 
 
 const date = new Date();
@@ -297,6 +347,7 @@ function setSummaryMonthly(year,month){
 
   allShuttlesSum = JSON.parse(localStorage.getItem(`${year}${month}allShuttlesSumMonthly`))
 
+  allshuttles = [];
   let dataSeriesAvgTop = [
     {
       name: "Avg",
@@ -361,18 +412,21 @@ function setSummaryMonthly(year,month){
 }
 
 function setIdleGraph(idleTime){
-  
+
   idleTime.sort((a, b) =>
     a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
   );
 
+  idleshuttles = [];
   dataIdleTime = [
       {
         name: "Idle Time",
         data: [],
       },
   ];
+  let totalIdleHours = 0;
   idleTime.forEach((it) => {
+    totalIdleHours += it.idle_time/3600;
     idleshuttles.push("Shuttle#" +it._id.shuttleNumber);
     dataIdleTime[0].data.push(Math.round(it.idle_time/3600));
   });
@@ -420,17 +474,21 @@ function setIdleGraph(idleTime){
     },
     series: dataIdleTime,
   });
+
+  $("#totalIdleTime").html(Math.round(totalIdleHours)+" hrs");
 }
 function setDeviceDistanceGraph(dDistance,totalDistance){
   $("#totalDistance").html(totalDistance+" km");
   distances = ''
+  let busiestShuttle = "";
+  let busiestDistance = -1;
   allShuttlesSum.forEach((s) => {
-    // allshuttles.push("Shuttle#" + s._id.shuttleNumber);
-    // dataSeriesAvgTop[0].data.push(s.avg_speed);
-    // dataSeriesAvgTop[1].data.push(s.top_speed);
-    i = Math.floor((Math.random() * 5) + 1)
     let dd = dDistance[s._id.device]
     dd=dd??0;
+    if(dd>busiestDistance){
+      busiestDistance = dd;
+      busiestShuttle = s._id.shuttleNumber;
+    }
     let color = 'bg-success';
     if((dd/30)>50){
       color = 'bg-warning'
@@ -450,6 +508,51 @@ function setDeviceDistanceGraph(dDistance,totalDistance){
       </div>`
   });
   $("#shuttle-distances").html(distances);
+  if(busiestShuttle){
+    $("#busiestShuttle").html("Shuttle#"+busiestShuttle);
+    $("#busiestShuttleDistance").html(busiestDistance+" km this month");
+  }
+}
+function setDailyTrendGraph(dailyTrend){
+  let days = [];
+  let avgSeries = [];
+  let topSeries = [];
+  dailyTrend.forEach((d) => {
+    days.push(d._id.day);
+    avgSeries.push(Math.round(d.avg_speed));
+    topSeries.push(Math.round(d.top_speed));
+  });
+
+  Highcharts.chart("daily-trend", {
+    chart: {
+      type: "line",
+    },
+    title: {
+      text: "",
+    },
+    xAxis: {
+      title: {
+        text: "Day of Month",
+      },
+      categories: days,
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: "Speed (kph)",
+      },
+    },
+    tooltip: {
+      shared: true,
+    },
+    credits: {
+      enabled: false,
+    },
+    series: [
+      { name: "Avg Speed", data: avgSeries },
+      { name: "Top Speed", data: topSeries },
+    ],
+  });
 }
 function setData(year,month){
   if(localStorage.getItem(`${year}${month}avgSpeedMonthly`)){
@@ -471,6 +574,10 @@ function setData(year,month){
     deviceDistanceMonthly = JSON.parse(deviceDistanceMonthly)
     deviceTDistanceMonthly = JSON.parse(deviceTDistanceMonthly)
     setDeviceDistanceGraph(deviceDistanceMonthly,deviceTDistanceMonthly);
+  }
+  dailyTrend = localStorage.getItem(`${year}${month}dailyTrendMonthly`);
+  if(dailyTrend){
+    setDailyTrendGraph(JSON.parse(dailyTrend));
   }
 }
 
@@ -511,6 +618,17 @@ function getNewData(year,month){
       setDeviceDistanceGraph(data.dDistance,data.totalDistance);
       localStorage.setItem(`${year}${month}deviceTDistanceMonthly`,JSON.stringify(data.totalDistance))
       localStorage.setItem(`${year}${month}deviceDistanceMonthly`,JSON.stringify(data.dDistance))
+    },
+  });
+
+  $.ajax({
+    url: `/getFleetDailyTrendMonthly/${year}/${month}`,
+    cache: false,
+    processData: false,
+    type: "GET",
+    success: function (data) {
+      setDailyTrendGraph(data.dailyTrend);
+      localStorage.setItem(`${year}${month}dailyTrendMonthly`,JSON.stringify(data.dailyTrend))
     },
   });
 }

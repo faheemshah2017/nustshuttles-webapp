@@ -139,6 +139,17 @@ router.get("/getIdleTimeMonthly/:year/:month", authUser, function (req, res, nex
   );
 });
 
+router.get("/getFleetDailyTrendMonthly/:year/:month", authUser, function (req, res, next) {
+  data_model.getFleetDailyTrendMonthly(
+    col_shuttlesData,
+    parseInt(req.params.year),
+    parseInt(req.params.month),
+    (r) => {
+      res.send({ dailyTrend: r });
+    }
+  );
+});
+
 router.get("/getlatlngByMonth/:year/:month", authUser, function (req, res, next) {
   data_model.getlatlngByMonth(
     col_shuttlesData,

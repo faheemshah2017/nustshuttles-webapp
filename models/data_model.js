@@ -1,3 +1,12 @@
+function monthRange(year, month) {
+  // Matches the UTC-based semantics of MongoDB's $year/$month operators
+  // used elsewhere, so filtering by range doesn't shift month boundaries.
+  return {
+    start: new Date(Date.UTC(year, month - 1, 1)),
+    end: new Date(Date.UTC(year, month, 1)),
+  };
+}
+
 var data_model = {
   getAll: function (collection, callback) {
     var query = {};
@@ -420,7 +429,17 @@ var data_model = {
     });
   },
   getlatlngByMonth: function (collection, year, month, callback) {
+    const { start, end } = monthRange(year, month);
     const agg = [
+      {
+        $match: {
+          datetime: { $gte: start, $lt: end },
+          speed: {
+            $gt: 2,
+            $lt: 60,
+          },
+        },
+      },
       {
         $project: {
           deviceId: 1,
@@ -428,24 +447,8 @@ var data_model = {
           longitude: 1,
           speed: 1,
           datetime: "$datetime",
-          year: {
-            $year: "$datetime",
-          },
-          month: {
-            $month: "$datetime",
-          },
           day: {
             $dayOfMonth: "$datetime",
-          },
-        },
-      },
-      {
-        $match: {
-          year: year,
-          month: month,
-          speed: {
-            $gt: 2,
-            $lt: 60,
           },
         },
       },
@@ -472,7 +475,18 @@ var data_model = {
     });
   },
   shuttlelatlngByMonth: function (collection, deviceId, year, month, callback) {
+    const { start, end } = monthRange(year, month);
     const agg = [
+      {
+        $match: {
+          deviceId: deviceId,
+          datetime: { $gte: start, $lt: end },
+          speed: {
+            $gt: 0,
+            $lt: 60,
+          },
+        },
+      },
       {
         $project: {
           deviceId: 1,
@@ -480,38 +494,12 @@ var data_model = {
           longitude: 1,
           speed: 1,
           datetime: "$datetime",
-          year: {
-            $year: "$datetime",
-          },
-          month: {
-            $month: "$datetime",
-          },
           day: {
             $dayOfMonth: "$datetime",
           },
         },
       },
-      {
-        $match: {
-          deviceId: deviceId,
-          year: year,
-          month: month,
-          speed: {
-            $gt: 0,
-            $lt: 60,
-          },
-        },
-      },
     ];
-    // const query = {
-    //   deviceId: deviceId,
-    //   datetime: {
-    //     $gte: new Date(date),
-    //   },
-    //   speed: {
-    //     $gt: 0,
-    //   },
-    // };
     collection.aggregate(agg).toArray(function (err, result) {
       if (err) throw err;
       return callback(result);
@@ -565,31 +553,25 @@ var data_model = {
     month,
     callback
   ) {
+    const { start, end } = monthRange(year, month);
     const agg = [
+      {
+        $match: {
+          deviceId: deviceId,
+          datetime: { $gte: start, $lt: end },
+          speed: {
+            $gt: 2,
+            $lt: 60,
+          },
+        },
+      },
       {
         $project: {
           deviceId: 1,
           speed: 1,
           datetime: "$datetime",
-          year: {
-            $year: "$datetime",
-          },
-          month: {
-            $month: "$datetime",
-          },
           day: {
             $dayOfMonth: "$datetime",
-          },
-        },
-      },
-      {
-        $match: {
-          deviceId: deviceId,
-          year: year,
-          month: month,
-          speed: {
-            $gt: 2,
-            $lt: 60,
           },
         },
       },
@@ -614,7 +596,17 @@ var data_model = {
     });
   },
   getSummaryMonthly: function (collection, year, month, callback) {
+    const { start, end } = monthRange(year, month);
     const agg = [
+      {
+        $match: {
+          datetime: { $gte: start, $lt: end },
+          speed: {
+            $gt: 2,
+            $lt: 60,
+          },
+        },
+      },
       {
         $lookup: {
           from: "shuttles",
@@ -629,37 +621,10 @@ var data_model = {
         },
       },
       {
-        $project: {
-          deviceId: 1,
-          speed: 1,
-          shuttleNumber: "$result.shuttleNumber",
-          datetime: "$datetime",
-          year: {
-            $year: "$datetime",
-          },
-          month: {
-            $month: "$datetime",
-          },
-          day: {
-            $dayOfMonth: "$datetime",
-          },
-        },
-      },
-      {
-        $match: {
-          year: year,
-          month: month,
-          speed: {
-            $gt: 2,
-            $lt: 60,
-          },
-        },
-      },
-      {
         $group: {
           _id: {
             device: "$deviceId",
-            shuttleNumber: "$shuttleNumber",
+            shuttleNumber: "$result.shuttleNumber",
           },
           avg_speed: {
             $avg: "$speed",
@@ -675,9 +640,18 @@ var data_model = {
       if (err) throw err;
       return callback(result);
     });
-  },  
+  },
   getIdleTimeMonthly: function (collection, year, month, callback) {
+    const { start, end } = monthRange(year, month);
     const agg = [
+      {
+        $match: {
+          datetime: { $gte: start, $lt: end },
+          idleTime: {
+            $gt: 0,
+          },
+        },
+      },
       {
         $lookup: {
           from: "shuttles",
@@ -692,40 +666,59 @@ var data_model = {
         },
       },
       {
+        $group: {
+          _id: {
+            device: "$deviceId",
+            shuttleNumber: "$result.shuttleNumber",
+          },
+          idle_time: {
+            $sum: "$idleTime",
+          },
+        },
+      },
+    ];
+
+    collection.aggregate(agg).toArray(function (err, result) {
+      if (err) throw err;
+      return callback(result);
+    });
+  },
+  getFleetDailyTrendMonthly: function (collection, year, month, callback) {
+    const { start, end } = monthRange(year, month);
+    const agg = [
+      {
+        $match: {
+          datetime: { $gte: start, $lt: end },
+          speed: {
+            $gt: 2,
+            $lt: 60,
+          },
+        },
+      },
+      {
         $project: {
-          deviceId: 1,
-          idleTime: 1,
-          shuttleNumber: "$result.shuttleNumber",
-          datetime: "$datetime",
-          year: {
-            $year: "$datetime",
-          },
-          month: {
-            $month: "$datetime",
-          },
+          speed: 1,
           day: {
             $dayOfMonth: "$datetime",
           },
         },
       },
       {
-        $match: {
-          year: year,
-          month: month,
-          idleTime:{
-            $gt: 0,
+        $group: {
+          _id: {
+            day: "$day",
+          },
+          avg_speed: {
+            $avg: "$speed",
+          },
+          top_speed: {
+            $max: "$speed",
           },
         },
       },
       {
-        $group: {
-          _id: {
-            device: "$deviceId",
-            shuttleNumber: "$shuttleNumber",
-          },
-          idle_time: {
-            $sum: "$idleTime",
-          },
+        $sort: {
+          "_id.day": 1,
         },
       },
     ];
