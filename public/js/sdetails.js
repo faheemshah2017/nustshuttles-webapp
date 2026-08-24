@@ -4,6 +4,15 @@ const date = new Date();
 month = date.getMonth() + 1;
 year = date.getFullYear();
 
+const yearSelect = document.getElementById("year");
+const startYear = 2022;
+for (let y = startYear; y <= year; y++) {
+  const option = document.createElement("option");
+  option.value = y;
+  option.text = y;
+  yearSelect.appendChild(option);
+}
+
 document.getElementById("month").value = month;
 document.getElementById("year").value = year;
 
