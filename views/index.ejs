@@ -58,11 +58,6 @@
                     </div>
                     <div class="col-md-7">
                       <select class="form-control" onchange="yearSelected(this)" id="year">
-                        <option value="2022">2022</option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
                       </select>
                     </div>
                   </div>
@@ -266,6 +261,15 @@ let allshuttles = [];
 const date = new Date();
 month = date.getMonth() + 1;
 year = date.getFullYear();
+
+const yearSelect = document.getElementById("year");
+const startYear = 2022;
+for (let y = startYear; y <= year; y++) {
+  const option = document.createElement("option");
+  option.value = y;
+  option.text = y;
+  yearSelect.appendChild(option);
+}
 
 document.getElementById("month").value = month;
 document.getElementById("year").value = year;
