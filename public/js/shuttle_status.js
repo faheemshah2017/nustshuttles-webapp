@@ -1,9 +1,14 @@
 const ONLINE_THRESHOLD_MS = 2 * 60 * 1000;   // 2 minutes
 const IDLE_THRESHOLD_MS = 15 * 60 * 1000;    // 15 minutes
+const FUTURE_TOLERANCE_MS = 5 * 60 * 1000;   // allow up to 5 minutes of clock drift
 const REFRESH_INTERVAL_MS = 30 * 1000;       // 30 seconds
 
 function timeSince(date) {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const diffMs = Date.now() - date.getTime();
+  if (diffMs < -FUTURE_TOLERANCE_MS) {
+    return "clock skew (" + date.toLocaleDateString() + ")";
+  }
+  const seconds = Math.floor(Math.max(diffMs, 0) / 1000);
   if (seconds < 60) return seconds + "s ago";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return minutes + "m ago";
@@ -18,6 +23,9 @@ function statusBadge(date) {
     return '<span class="badge badge-secondary">Never</span>';
   }
   const age = Date.now() - date.getTime();
+  if (age < -FUTURE_TOLERANCE_MS) {
+    return '<span class="badge badge-dark" title="Device clock is reporting a time far in the future">Invalid Clock</span>';
+  }
   if (age <= ONLINE_THRESHOLD_MS) {
     return '<span class="badge badge-success">Online</span>';
   }
