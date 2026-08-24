@@ -1,5 +1,6 @@
 var express = require("express");
 const data_model = require("../models/data_model");
+const { requireEditor } = require("../lib/permissions");
 var router = express.Router();
 
 authUser = function (req, res, next) {
@@ -73,7 +74,7 @@ router.get("/newAlerts", authUser, function (req, res, next) {
   );
 });
 
-router.get("/deleteAlert/:id", authUser, function (req, res, next) {
+router.get("/deleteAlert/:id", requireEditor, function (req, res, next) {
   data_model.delete(col_alerts,req.params.id,(resp)=>{
     data_model.getAll(
       col_alerts,
@@ -246,7 +247,7 @@ router.get("/shuttleLocation", function (req, res, next) {
 });
 
 router.get("/settings", authUser, function (req, res, next) {
-  if (req.user.role != "manager") {
+  if (!["admin", "manager"].includes(req.user.role)) {
     res.redirect("/");
   } else {
     data_model.getAll(col_settings, (settings) => {

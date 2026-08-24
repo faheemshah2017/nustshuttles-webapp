@@ -98,6 +98,14 @@
         <span>Routes</span>
       </a>
     </li>
+    <% if(typeof user !== 'undefined' && user && user.role=='admin'){ %>
+    <li class="nav-item <% if(page=='userManagement'){ %>nav-active<% } %>">
+      <a class="nav-link" href="/users/manage">
+        <i class="fas fa-fw fa-users-cog"></i>
+        <span>User Management</span>
+      </a>
+    </li>
+    <% } %>
     <hr class="sidebar-divider">
     <div class="version" id="version-ruangadmin"></div>
   </ul>

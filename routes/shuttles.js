@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const { requireEditor } = require('../lib/permissions');
 
 authUser = function (req, res, next) {
   if (req.isAuthenticated()) {
@@ -47,7 +48,7 @@ router.get('/get', function (req, res, next) {
   })
 });
 
-router.post('/add', function (req, res, next) {
+router.post('/add', requireEditor, function (req, res, next) {
   data_model.add(col_shuttles, req.body,async (resp) => {
     try{
       const child = ref.child(req.body.deviceId)
@@ -60,13 +61,13 @@ router.post('/add', function (req, res, next) {
   })
 });
 
-router.delete('/delete/:id', function (req, res, next) {
+router.delete('/delete/:id', requireEditor, function (req, res, next) {
   data_model.delete(col_shuttles, req.params.id, (resp) => {
     res.send(resp)
   })
 });
 
-router.post('/update/:id', function (req, res, next) {
+router.post('/update/:id', requireEditor, function (req, res, next) {
   data_model.update(col_shuttles, req.params.id, req.body,async (resp) => {
     try{
       const child = ref.child(req.body.deviceId)
