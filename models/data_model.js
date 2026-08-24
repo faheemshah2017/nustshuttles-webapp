@@ -691,16 +691,22 @@ var data_model = {
       let remaining = shuttles.length;
       let results = [];
       shuttles.forEach((shuttle) => {
+        // Sort by _id (server insertion order), not the device-reported
+        // datetime field: a device clock glitch on a single old ping can
+        // otherwise permanently look like "the latest" data, even though
+        // the device has since sent thousands of good, current pings.
         shuttlesDataCollection
           .find({ deviceId: shuttle.deviceId })
-          .sort({ datetime: -1 })
+          .sort({ _id: -1 })
           .limit(1)
           .toArray(function (err, docs) {
             if (err) throw err;
+            const lastData = docs[0] || null;
             results.push({
               deviceId: shuttle.deviceId,
               shuttleNumber: shuttle.shuttleNumber,
-              lastData: docs[0] || null,
+              lastData: lastData,
+              receivedAt: lastData ? lastData._id.getTimestamp() : null,
             });
             remaining--;
             if (remaining === 0) {

@@ -1,14 +1,10 @@
 const ONLINE_THRESHOLD_MS = 2 * 60 * 1000;   // 2 minutes
 const IDLE_THRESHOLD_MS = 15 * 60 * 1000;    // 15 minutes
-const FUTURE_TOLERANCE_MS = 5 * 60 * 1000;   // allow up to 5 minutes of clock drift
+const CLOCK_MISMATCH_MS = 24 * 60 * 60 * 1000; // flag device clock if off by more than a day
 const REFRESH_INTERVAL_MS = 30 * 1000;       // 30 seconds
 
 function timeSince(date) {
-  const diffMs = Date.now() - date.getTime();
-  if (diffMs < -FUTURE_TOLERANCE_MS) {
-    return "clock skew (" + date.toLocaleDateString() + ")";
-  }
-  const seconds = Math.floor(Math.max(diffMs, 0) / 1000);
+  const seconds = Math.floor(Math.max(Date.now() - date.getTime(), 0) / 1000);
   if (seconds < 60) return seconds + "s ago";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return minutes + "m ago";
@@ -23,9 +19,6 @@ function statusBadge(date) {
     return '<span class="badge badge-secondary">Never</span>';
   }
   const age = Date.now() - date.getTime();
-  if (age < -FUTURE_TOLERANCE_MS) {
-    return '<span class="badge badge-dark" title="Device clock is reporting a time far in the future">Invalid Clock</span>';
-  }
   if (age <= ONLINE_THRESHOLD_MS) {
     return '<span class="badge badge-success">Online</span>';
   }
@@ -55,15 +48,25 @@ function renderStatus(statuses) {
 
   let rows = "";
   statuses.forEach((s) => {
-    const lastData = s.lastData;
-    const lastDate = lastData && lastData.datetime ? new Date(lastData.datetime) : null;
+    // receivedAt is when our server actually got this ping (from Mongo's
+    // _id) - reliable regardless of the device's own clock, and what
+    // drives the status badge below. The device's self-reported
+    // "datetime" is only shown as a warning when it disagrees badly.
+    const receivedAt = s.receivedAt ? new Date(s.receivedAt) : null;
+    const deviceDate = s.lastData && s.lastData.datetime ? new Date(s.lastData.datetime) : null;
+
+    let clockWarning = "";
+    if (receivedAt && deviceDate && Math.abs(receivedAt.getTime() - deviceDate.getTime()) > CLOCK_MISMATCH_MS) {
+      clockWarning = `<br><span class="small text-danger">device clock says ${deviceDate.toLocaleString()}</span>`;
+    }
+
     rows += `
       <tr>
         <td>Shuttle#${s.shuttleNumber}</td>
         <td>${s.deviceId}</td>
-        <td>${lastDate ? lastDate.toLocaleString() : "&mdash;"}</td>
-        <td>${lastDate ? timeSince(lastDate) : "&mdash;"}</td>
-        <td>${statusBadge(lastDate)}</td>
+        <td>${receivedAt ? receivedAt.toLocaleString() : "&mdash;"}${clockWarning}</td>
+        <td>${receivedAt ? timeSince(receivedAt) : "&mdash;"}</td>
+        <td>${statusBadge(receivedAt)}</td>
       </tr>`;
   });
 
