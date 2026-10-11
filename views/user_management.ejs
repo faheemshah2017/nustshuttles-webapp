@@ -55,6 +55,9 @@
                                     <span class="small text-muted">(you)</span>
                                   <% } else { %>
                                     <select class="form-control form-control-sm role-select" style="width: 130px; display: inline-block;" data-id="<%=u._id%>">
+                                      <% if (!u.role) { %>
+                                        <option value="" disabled selected>No role set</option>
+                                      <% } %>
                                       <option value="admin" <% if(u.role=='admin'){ %>selected<% } %>>admin</option>
                                       <option value="manager" <% if(u.role=='manager'){ %>selected<% } %>>manager</option>
                                       <option value="viewer" <% if(u.role=='viewer'){ %>selected<% } %>>viewer</option>
