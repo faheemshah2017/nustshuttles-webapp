@@ -307,10 +307,18 @@ function setShuttlesTable(shuttles) {
 
         row += `<tr><td>${shuttle.deviceId}</td>
         <td>${shuttle.shuttleNumber}</td>`;
-      
+
+        let routeInfo = '<span class="text-muted">No route assigned</span>';
+        if (Array.isArray(shuttle.route) && shuttle.route.length) {
+            routeInfo = shuttle.route
+                .map((r) => `${r.title || "Route"} (${r.from || "?"}-${r.to || "?"})`)
+                .join("<br>");
+        }
+        row += `<td>${routeInfo}</td>`;
+
         // row += `<td><button type="button" id="${shuttle._id}" onclick="locateShuttle(this)" class="btn btn-outline-info mb-1 mr-1"><i class="fas fa-search"></i></button></td><td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
         row += `<td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
-        
+
         row += "</tr>"
 
     });
