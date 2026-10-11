@@ -22,8 +22,10 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-xl-12">
+                    <% if(user.role !== 'viewer'){ %>
                     <button class="btn btn-primary mb-1" style="float: right;" onclick="addShuttleClick()"
                       data-toggle="modal" id="addShuttleBtn" data-target="#addShutteModal">Add +</button>
+                    <% } %>
                   </div>
                 </div>
                 <!--Row-->
@@ -146,6 +148,7 @@
   <script>
     routes = <%- JSON.stringify(routes); %>;
     shuttles = <%- JSON.stringify(shuttles); %>;
+    currentUserRole = <%- JSON.stringify(user.role); %>;
   </script>
   <script src="/js/shuttles.js"></script>
 

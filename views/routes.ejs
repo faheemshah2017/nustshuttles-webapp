@@ -57,15 +57,28 @@
                         </option>
                         <% }); %>
                     </select>
-                    <input type="checkbox" id="enableStopsCheckbox" name="enableStopsCheckbox" value="enableStopsCheckbox">
+                    <div class="custom-control custom-checkbox" style="display: inline-block; margin-left: 10px;">
+                      <input type="checkbox" class="custom-control-input" id="enableStopsCheckbox" name="enableStopsCheckbox" value="enableStopsCheckbox">
+                      <label class="custom-control-label" for="enableStopsCheckbox" title="Shows a dot for every point on the route. Orange dots are named stops - click any dot to add, rename, or clear a stop there.">
+                        Show Stops <i class="fas fa-question-circle text-muted"></i>
+                      </label>
+                    </div>
+                    <% if(user.role !== 'viewer'){ %>
                     <button class="btn btn-primary mb-1" style="float: right;display: none;" data-toggle="modal"
-                      id="saveRouteBtn" data-target="#addRouteModal">Save</button>
+                      id="saveRouteBtn" data-target="#addRouteModal" disabled>Save</button>
                     <button class="btn btn-primary mb-1" style="float: right;display: none;" id="cancelRouteBtn"
                       onclick="cancelRoute()">Cancel</button>
 
                     <button class="btn btn-primary mb-1" style="float: right;display: block;" id="addRouteBtn"
                       onclick="addRoute()">Add +</button>
+                    <% } %>
 
+                  </div>
+                  <div class="col-xl-12">
+                    <div id="routeDrawHint" class="alert alert-info" style="display: none;">
+                      Click the map to add points to the route (<span id="routePointCount">0</span> added).
+                      Right-click to undo the last point. At least 2 points are needed before you can save.
+                    </div>
                   </div>
                   <div class="col-lg-12">
                     <div id="map" style="height:800px;"></div>
@@ -171,6 +184,7 @@
   <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
   <script>
     routes = <%- JSON.stringify(routes); %>;
+    currentUserRole = <%- JSON.stringify(user.role); %>;
   </script>
   <script src="/js/routes.js"></script>
 
