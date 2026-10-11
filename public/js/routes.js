@@ -88,6 +88,7 @@ function initMap() {
       marker[markerIndex].setMap(null)
     } catch (e) {}
     flightPath[i].setMap(map);
+    updateRouteDrawHint();
   });
 
   map.addListener("click", (mapsMouseEvent) => {
@@ -126,6 +127,7 @@ function initMap() {
       } catch (e) {}
       flightPath[i].setMap(map);
       lastRoute = i;
+      updateRouteDrawHint();
     }
   });
 
@@ -153,6 +155,7 @@ function cancelRoute() {
   $("#saveRouteBtn").css("display", "none");
   $("#cancelRouteBtn").css("display", "none");
   $("#addRouteBtn").css("display", "block");
+  $("#routeDrawHint").css("display", "none");
   showLabels();
   addingRoute = false;
   // Close the current InfoWindow.
@@ -161,7 +164,7 @@ function cancelRoute() {
   try {
     flightPath[lastRoute].setMap(null);
   } catch (e) {}
-  
+
   marker.forEach(mark=>{
     try{
       mark.setMap(null)
@@ -169,6 +172,11 @@ function cancelRoute() {
   })
   markerIndex = 0;
   marker = [];
+}
+
+function updateRouteDrawHint() {
+  $("#routePointCount").text(newRoute.length);
+  $("#saveRouteBtn").prop("disabled", newRoute.length < 2);
 }
 
 function addRoute() {
@@ -181,8 +189,10 @@ function addRoute() {
   $("#saveRouteBtn").css("display", "block");
   $("#cancelRouteBtn").css("display", "block");
   $("#addRouteBtn").css("display", "none");
+  $("#routeDrawHint").css("display", "block");
   newRoute = [];
   addingRoute = true;
+  updateRouteDrawHint();
   // Create a new InfoWindow.
   infoWindow = new google.maps.InfoWindow({
     content: "Click the map to create route",
@@ -245,16 +255,23 @@ function distance(lat1, lat2, lon1, lon2) {
 }
 
 enableStops = false;
+let currentRouteId = null;
 
 const enableStopsCheckbox = document.getElementById('enableStopsCheckbox')
 
 enableStopsCheckbox.addEventListener('change', (event) => {
   enableStops = event.target.checked
+  // Re-render so toggling takes effect immediately on whatever route is
+  // currently selected, instead of only on the next dropdown change.
+  if (currentRouteId) {
+    selectRoute(currentRouteId)
+  }
 })
 
 
 function selectRoute(routeID) {
 // let totalDistance = 0;
+  currentRouteId = routeID;
   let flightPlanCoordinates = routes.find((r) => r._id == routeID).path;
   flightPath[routeID] = new google.maps.Polyline({
     path: flightPlanCoordinates,
@@ -296,16 +313,18 @@ function selectRoute(routeID) {
         },
         title: stopName
       });
-      marker[i].addListener("click", () => {
-        document.getElementById("stopId").value = marker[i].get("id");
-        if(!isNumeric(marker[i].title)){
-          document.getElementById("stopName").value = marker[i].title;
-        }
-        else{
-          document.getElementById("stopName").value = "";
-        }
-        $('#addStopModal').modal('show');
-      });
+      if (typeof currentUserRole === "undefined" || currentUserRole !== "viewer") {
+        marker[i].addListener("click", () => {
+          document.getElementById("stopId").value = marker[i].get("id");
+          if(!isNumeric(marker[i].title)){
+            document.getElementById("stopName").value = marker[i].title;
+          }
+          else{
+            document.getElementById("stopName").value = "";
+          }
+          $('#addStopModal').modal('show');
+        });
+      }
       marker[i].setValues({type: pointType, id: i});
     })
   }
@@ -420,7 +439,11 @@ function setRoutesTable(routes) {
     row += `<tr><td>${route.routeTitle}</td><td>${route.routeNumber}</td>
       <td>${route.pathNumber}</td>
       <td>${totalDistance.toFixed(2)} Km</td>`;
-    row += `<td><button type="button" id="${route._id}" onclick="editRoute(this)"  data-toggle="modal" data-target="#addRouteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${route._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
+    if (typeof currentUserRole === "undefined" || currentUserRole !== "viewer") {
+      row += `<td><button type="button" id="${route._id}" onclick="editRoute(this)"  data-toggle="modal" data-target="#addRouteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${route._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button></td>`;
+    } else {
+      row += `<td></td>`;
+    }
 
     row += "</tr>";
   });

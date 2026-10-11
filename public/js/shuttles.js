@@ -320,8 +320,11 @@ function setShuttlesTable(shuttles) {
         }
         row += `<td>${routeInfo}</td>`;
 
-        // row += `<td><button type="button" id="${shuttle._id}" onclick="locateShuttle(this)" class="btn btn-outline-info mb-1 mr-1"><i class="fas fa-search"></i></button></td><td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
-        row += `<td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button>`;
+        if (typeof currentUserRole === "undefined" || currentUserRole !== "viewer") {
+            row += `<td><button type="button" id="${shuttle._id}" onclick="editShuttle(this)"  data-toggle="modal" data-target="#addShutteModal" class="btn btn-outline-primary mb-1 mr-1"><i class="fas fa-edit"></i></button><button type="button" id="${shuttle._id}" onclick="confirmDelete(this)" class="btn btn-outline-danger mb-1 mr-1"><i class="fas fa-trash"></i></button></td>`;
+        } else {
+            row += `<td></td>`;
+        }
 
         row += "</tr>"
 
