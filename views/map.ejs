@@ -73,7 +73,7 @@
     </style>
   <script>
     let map;
-    tracking = <%- JSON.stringify(tracking); %>;
+    tracking = <%- safeJson(tracking); %>;
 
   setInterval(function () {  
     $.ajax({

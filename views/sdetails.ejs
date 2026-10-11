@@ -240,8 +240,8 @@
   </body>
 
   <script>
-  shuttle = <%- JSON.stringify(shuttle); %>;
-  deviceId = <%- JSON.stringify(deviceId); %>;
+  shuttle = <%- safeJson(shuttle); %>;
+  deviceId = <%- safeJson(deviceId); %>;
 // let allshuttles = [];
 // let dataSeriesAvgTop = [
 //   {
