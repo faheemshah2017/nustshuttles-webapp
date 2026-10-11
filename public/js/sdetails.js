@@ -104,7 +104,7 @@ debugger
 function setIdleGraph(idleTime){
   
   idleTime.sort((a, b) =>
-    a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
+    ("" + a._id.shuttleNumber).localeCompare("" + b._id.shuttleNumber, undefined, { numeric: true })
   );
 
   dataIdleTime = [
