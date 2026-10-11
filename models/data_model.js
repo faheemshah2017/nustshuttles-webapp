@@ -684,7 +684,7 @@ var data_model = {
     });
   },
   getLastPingPerShuttle: function (shuttlesCollection, shuttlesDataCollection, callback) {
-    const SAMPLE_SIZE = 20;
+    const SAMPLE_SIZE = 2; // just need the two most recent pings for the latest gap
     shuttlesCollection.find({}).toArray(function (err, shuttles) {
       if (err) throw err;
       if (!shuttles.length) return callback([]);
@@ -704,29 +704,20 @@ var data_model = {
             if (err) throw err;
             const lastData = docs[0] || null;
 
-            // docs are newest-first; gaps between consecutive server
-            // receipt times (from _id, not the device's own clock) give
-            // the actual reporting interval, regardless of device clock
-            // reliability.
-            let gapsMs = [];
-            for (let i = 0; i < docs.length - 1; i++) {
-              const newer = docs[i]._id.getTimestamp().getTime();
-              const older = docs[i + 1]._id.getTimestamp().getTime();
-              gapsMs.push(newer - older);
-            }
-            const avgIntervalMs = gapsMs.length
-              ? gapsMs.reduce((a, b) => a + b, 0) / gapsMs.length
-              : null;
-            const maxIntervalMs = gapsMs.length ? Math.max(...gapsMs) : null;
+            // Gap between the two most recent server receipt times (from
+            // _id, not the device's own clock) - the actual time it took
+            // to get the newest update.
+            const lastGapMs =
+              docs.length >= 2
+                ? docs[0]._id.getTimestamp().getTime() - docs[1]._id.getTimestamp().getTime()
+                : null;
 
             results.push({
               deviceId: shuttle.deviceId,
               shuttleNumber: shuttle.shuttleNumber,
               lastData: lastData,
               receivedAt: lastData ? lastData._id.getTimestamp() : null,
-              avgIntervalMs: avgIntervalMs,
-              maxIntervalMs: maxIntervalMs,
-              sampleCount: docs.length,
+              lastGapMs: lastGapMs,
             });
             remaining--;
             if (remaining === 0) {
