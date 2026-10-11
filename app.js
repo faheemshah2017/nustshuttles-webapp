@@ -156,6 +156,12 @@ app.locals.safeJson = function (obj) {
   var LINE_SEPARATOR = String.fromCharCode(8232);
   var PARAGRAPH_SEPARATOR = String.fromCharCode(8233);
   var json = JSON.stringify(obj);
+  if (json === undefined) {
+    // JSON.stringify(undefined) returns the value undefined, not a
+    // string (e.g. a legacy user doc with no "role" field yet) - fall
+    // back to a valid JSON literal instead of crashing the page.
+    json = 'null';
+  }
   json = json.split('<').join(BACKSLASH + 'u003c');
   json = json.split(LINE_SEPARATOR).join(BACKSLASH + 'u2028');
   json = json.split(PARAGRAPH_SEPARATOR).join(BACKSLASH + 'u2029');
