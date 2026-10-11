@@ -63,7 +63,7 @@
                         Show Stops <i class="fas fa-question-circle text-muted"></i>
                       </label>
                     </div>
-                    <% if(user.role !== 'viewer'){ %>
+                    <% if(user.role === 'admin' || user.role === 'manager'){ %>
                     <button class="btn btn-primary mb-1" style="float: right;display: none;" data-toggle="modal"
                       id="saveRouteBtn" data-target="#addRouteModal" disabled>Save</button>
                     <button class="btn btn-primary mb-1" style="float: right;display: none;" id="cancelRouteBtn"
@@ -184,7 +184,7 @@
   <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
   <script>
     routes = <%- safeJson(routes); %>;
-    currentUserRole = <%- safeJson(user.role); %>;
+    currentUserRole = <%- safeJson(user.role || 'viewer'); %>;
   </script>
   <script src="/js/routes.js"></script>
 
