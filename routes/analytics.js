@@ -36,15 +36,32 @@ saveLogs = (message) => {
 /* GET home page. */
 router.get("/", authUser, function (req, res, next) {
   data_model.getSummaryMonthly(col_shuttlesData,getCurrentYear(),getCurrentMonth(), (r) => {
-    console.log(r)
-    data = {
-      page: "analytics",
-      title: "Analytics | Nust Shuttles",
-      plugins: [],
-      user: req.user,
-      allShuttlesSum: r,
-    };
-    res.render("analytics", data);
+    data_model.getAll(col_shuttles, (shuttles) => {
+      // getSummaryMonthly only returns shuttles that had at least one
+      // qualifying (speed > 2kph) ping this month, so an idle/parked/
+      // newly-added shuttle would otherwise silently vanish from this
+      // page instead of showing up with "no data" - confusing, since it
+      // still shows normally on Shuttles/Shuttle Status.
+      const reported = new Set(r.map((s) => s._id.device));
+      shuttles.forEach((shuttle) => {
+        if (!reported.has(shuttle.deviceId)) {
+          r.push({
+            _id: { device: shuttle.deviceId, shuttleNumber: shuttle.shuttleNumber },
+            avg_speed: null,
+            top_speed: null,
+            noData: true,
+          });
+        }
+      });
+      data = {
+        page: "analytics",
+        title: "Analytics | Nust Shuttles",
+        plugins: [],
+        user: req.user,
+        allShuttlesSum: r,
+      };
+      res.render("analytics", data);
+    });
   });
 });
 
