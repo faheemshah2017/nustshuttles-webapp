@@ -77,6 +77,12 @@ mongodb.connectToMongo(function (db_conn) {
     col_logs = db_conn.collection('logs');
     col_tracking = db_conn.collection('tracking');
     col_shuttlesData = db_conn.collection('shuttlesData');
+    col_shuttlesData.createIndex({ deviceId: 1, datetime: 1 }).catch((err) => {
+        console.error('Failed to create shuttlesData index', err);
+    });
+    col_shuttlesData.createIndex({ deviceId: 1, _id: 1 }).catch((err) => {
+        console.error('Failed to create shuttlesData deviceId/_id index', err);
+    });
 });
 
 const user = encodeURIComponent(SysConfig.settings.liveDB.username);

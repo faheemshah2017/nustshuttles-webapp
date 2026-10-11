@@ -1,5 +1,30 @@
 var express = require('express');
 var router = express.Router();
+const { requireEditor } = require('../lib/permissions');
+
+authUser = function (req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+};
+
+router.get('/status', authUser, function (req, res, next) {
+  data = {
+    page: 'shuttleStatus',
+    title: 'Shuttle Status | Nust Shuttles',
+    plugins: [],
+    user: req.user,
+  };
+  res.render('shuttle_status', data);
+});
+
+router.get('/statusData', authUser, function (req, res, next) {
+  data_model.getLastPingPerShuttle(col_shuttles, col_shuttlesData, (statuses) => {
+    res.send(statuses);
+  });
+});
 
 router.get('/', function (req, res, next) {
   data_model.getAll(col_shuttles, (shuttles) => {
@@ -23,7 +48,7 @@ router.get('/get', function (req, res, next) {
   })
 });
 
-router.post('/add', function (req, res, next) {
+router.post('/add', requireEditor, function (req, res, next) {
   data_model.add(col_shuttles, req.body,async (resp) => {
     try{
       const child = ref.child(req.body.deviceId)
@@ -36,13 +61,13 @@ router.post('/add', function (req, res, next) {
   })
 });
 
-router.delete('/delete/:id', function (req, res, next) {
+router.delete('/delete/:id', requireEditor, function (req, res, next) {
   data_model.delete(col_shuttles, req.params.id, (resp) => {
     res.send(resp)
   })
 });
 
-router.post('/update/:id', function (req, res, next) {
+router.post('/update/:id', requireEditor, function (req, res, next) {
   data_model.update(col_shuttles, req.params.id, req.body,async (resp) => {
     try{
       const child = ref.child(req.body.deviceId)

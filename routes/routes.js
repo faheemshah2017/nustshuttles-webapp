@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const { requireEditor } = require('../lib/permissions');
 
 router.get('/', function (req, res, next) {
     data_model.getAll(col_routes, (resp) => {
@@ -13,13 +14,13 @@ router.get('/', function (req, res, next) {
         res.render('routes', data);
     })
 });
-router.post('/add',saveLogs("Added Route"), function (req, res, next) {
+router.post('/add', requireEditor, saveLogs("Added Route"), function (req, res, next) {
     data_model.add(col_routes, req.body, (resp) => {
         res.send(resp)
     })
 });
 
-router.post('/update/:id',saveLogs("Updated Route"), function (req, res, next) {
+router.post('/update/:id', requireEditor, saveLogs("Updated Route"), function (req, res, next) {
     data_model.update(col_routes, req.params.id, req.body, (resp) => {
       res.send(resp)
     })
@@ -31,7 +32,7 @@ router.get('/get', function (req, res, next) {
     })
 });
 
-router.delete('/delete/:id', function (req, res, next) {
+router.delete('/delete/:id', requireEditor, function (req, res, next) {
     data_model.delete(col_routes,req.params.id, (resp) => {
         res.send(resp)
     })

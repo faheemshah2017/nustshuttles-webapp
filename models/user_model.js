@@ -126,11 +126,15 @@ var user_model = {
                     console.log(err);
                 }
                 user_data.password = hash;
+                if (user_data.active === undefined) {
+                    user_data.active = true;
+                }
                 col_users.find({}).count(function (err, count) {
                     if (err) throw err;
                     if(count==0){
-                        user_data.role = "manager";
-                        user_data.active = true;
+                        // First-ever user needs to be an admin, or nobody
+                        // could reach the user management page to create one.
+                        user_data.role = "admin";
                     }
                     col_users.findOne({'email':user_data.email}, function(err, user) {
                         if (err) throw err;

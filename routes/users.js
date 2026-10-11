@@ -1,7 +1,73 @@
 var express = require('express');
 var router = express.Router();
 var nodemailer = require('nodemailer');
-const { authUser } = require('../models/user_model');
+const { requireAdmin } = require('../lib/permissions');
+
+//------------------------- User Management (admin only) --------------------------//
+
+router.get('/manage', requireAdmin, function (req, res, next) {
+  user_model.getUsers(function (users) {
+    data = {
+      page: 'userManagement',
+      title: 'User Management | Nust Shuttles',
+      plugins: [],
+      user: req.user,
+      users: users,
+    };
+    res.render('user_management', data);
+  });
+});
+
+router.post('/create', requireAdmin, function (req, res, next) {
+  const { firstName, lastName, email, password, role } = req.body;
+  if (!firstName || !email || !password || !role) {
+    return res.status(400).send({ error: 'firstName, email, password and role are required' });
+  }
+  if (!['admin', 'manager', 'viewer'].includes(role)) {
+    return res.status(400).send({ error: 'Invalid role' });
+  }
+  user_model.addUser(
+    { firstName: firstName, lastName: lastName || '', email: email, role: role },
+    password,
+    function (success, existingEmail) {
+      if (success) {
+        res.send({ success: true });
+      } else {
+        res.status(400).send({ error: existingEmail ? 'A user with that email already exists' : 'Failed to create user' });
+      }
+    }
+  );
+});
+
+router.put('/manage/:id/role', requireAdmin, function (req, res, next) {
+  if (!['admin', 'manager', 'viewer'].includes(req.body.role)) {
+    return res.status(400).send({ error: 'Invalid role' });
+  }
+  if (req.user._id.toString() === req.params.id && req.body.role !== 'admin') {
+    return res.status(400).send({ error: "You can't remove your own admin access" });
+  }
+  user_model.activateUser(req.params.id, { role: req.body.role }, function (success) {
+    res.send({ success: success });
+  });
+});
+
+router.put('/manage/:id/password', requireAdmin, function (req, res, next) {
+  if (!req.body.password) {
+    return res.status(400).send({ error: 'Password is required' });
+  }
+  user_model.updateUser(req.params.id, { password: req.body.password }, function (success) {
+    res.send({ success: success });
+  });
+});
+
+router.delete('/manage/:id', requireAdmin, function (req, res, next) {
+  if (req.user._id.toString() === req.params.id) {
+    return res.status(400).send({ error: "You can't delete your own account while logged in" });
+  }
+  user_model.deleteUser(req.params.id, function (success) {
+    res.send({ success: success });
+  });
+});
 
 //------------------------- Users Crud --------------------------//
 router.get('/list', authUser, function(req, res, next) {
@@ -153,7 +219,7 @@ router.put('/update/privileges', function(req, res, next) {
     
 });
 
-router.put('/update/:id',authUser, function(req, res, next) {
+router.put('/update/:id',requireAdmin, function(req, res, next) {
     
     var data = {
         password: req.body.password
@@ -178,7 +244,8 @@ router.put('/set_password/:token', function(req, res, next) {
 });
 
 
-router.put('/activate/:id',authUser, function(req, res, next) {
+router.put('/activate/:id',requireAdmin, function(req, res, next) {
+    delete req.body.password; // this generic $set endpoint must never write a plaintext password
     user_model.activateUser(req.params.id, req.body, function(result) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(result));
@@ -187,8 +254,8 @@ router.put('/activate/:id',authUser, function(req, res, next) {
 });
 
 
-router.delete('/delete', function(req, res, next) {
-    
+router.delete('/delete', requireAdmin, function(req, res, next) {
+
     user_model.deleteUser(req.body.row_id, function(result) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(result));
