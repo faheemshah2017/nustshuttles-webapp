@@ -146,9 +146,9 @@
     async>
   </script> -->
   <script>
-    routes = <%- JSON.stringify(routes); %>;
-    shuttles = <%- JSON.stringify(shuttles); %>;
-    currentUserRole = <%- JSON.stringify(user.role); %>;
+    routes = <%- safeJson(routes); %>;
+    shuttles = <%- safeJson(shuttles); %>;
+    currentUserRole = <%- safeJson(user.role); %>;
   </script>
   <script src="/js/shuttles.js"></script>
 

@@ -97,7 +97,7 @@
   <script>
     let map;
 
-    allShuttlesSum = <%- JSON.stringify(allShuttlesSum); %>;
+    allShuttlesSum = <%- safeJson(allShuttlesSum); %>;
 
   </script>
 

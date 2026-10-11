@@ -69,7 +69,7 @@
 
   <script>
     
-    data = <%- JSON.stringify(data); %>;
+    data = <%- safeJson(data); %>;
 
     setAlertsTable(data)
     

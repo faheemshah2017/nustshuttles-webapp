@@ -174,7 +174,7 @@
 
       <!-- Page level custom scripts -->
       <script>
-        settings = <%- JSON.stringify(settings) %>
+        settings = <%- safeJson(settings) %>
           $(document).ready(function () {
             $('#email_receivers').val(settings.email_receivers);
             $('#mobile_receivers').val(settings.mobile_receivers);

@@ -144,6 +144,24 @@ data_model = require('./models/data_model');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Safe way to embed server data as JSON inside an inline <script> tag.
+// Plain JSON.stringify() output can contain "</script>" (which an HTML
+// parser reads as closing the tag early, truncating/corrupting the
+// script - exactly this happened with a route/stop name on the Routes
+// page) or U+2028/U+2029, which are valid in JSON strings but illegal
+// as raw line terminators in JS source. Available in every view as
+// `safeJson`.
+app.locals.safeJson = function (obj) {
+  var BACKSLASH = String.fromCharCode(92);
+  var LINE_SEPARATOR = String.fromCharCode(8232);
+  var PARAGRAPH_SEPARATOR = String.fromCharCode(8233);
+  var json = JSON.stringify(obj);
+  json = json.split('<').join(BACKSLASH + 'u003c');
+  json = json.split(LINE_SEPARATOR).join(BACKSLASH + 'u2028');
+  json = json.split(PARAGRAPH_SEPARATOR).join(BACKSLASH + 'u2029');
+  return json;
+};
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

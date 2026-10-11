@@ -183,8 +183,8 @@
 
   <script src="https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js"></script>
   <script>
-    routes = <%- JSON.stringify(routes); %>;
-    currentUserRole = <%- JSON.stringify(user.role); %>;
+    routes = <%- safeJson(routes); %>;
+    currentUserRole = <%- safeJson(user.role); %>;
   </script>
   <script src="/js/routes.js"></script>
 
