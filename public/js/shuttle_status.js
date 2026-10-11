@@ -4,6 +4,12 @@ const CLOCK_MISMATCH_MS = 24 * 60 * 60 * 1000; // flag device clock if off by mo
 const REFRESH_INTERVAL_MS = 30 * 1000;       // 30 seconds
 const EXPECTED_INTERVAL_SECONDS = 20;        // trackers normally report about every 20s
 
+// Last known ping-to-ping gap per shuttle, kept across refreshes. Only
+// updated while a shuttle is Online; frozen at its last value otherwise,
+// so an Idle/Offline shuttle keeps showing how fast it *was* updating
+// instead of a stale/meaningless gap from whenever it stopped.
+const lastKnownGapMs = {};
+
 function formatDuration(ms) {
   const seconds = Math.round(ms / 1000);
   if (seconds < 60) return seconds + "s";
@@ -14,19 +20,26 @@ function formatDuration(ms) {
   return hours + "h " + (minutes % 60) + "m";
 }
 
-function intervalCell(avgIntervalMs, sampleCount) {
-  if (avgIntervalMs == null || sampleCount < 2) {
+function intervalCell(deviceId, status, lastGapMs) {
+  if (status === "online" && lastGapMs != null) {
+    lastKnownGapMs[deviceId] = lastGapMs;
+  }
+
+  const ms = lastKnownGapMs[deviceId];
+  if (ms == null) {
     return '<span class="text-muted">Not enough data</span>';
   }
-  const avgSeconds = avgIntervalMs / 1000;
+
+  const seconds = ms / 1000;
   let badgeClass = "badge-success";
-  if (avgSeconds > EXPECTED_INTERVAL_SECONDS * 4) {
+  if (seconds > EXPECTED_INTERVAL_SECONDS * 4) {
     badgeClass = "badge-danger";
-  } else if (avgSeconds > EXPECTED_INTERVAL_SECONDS * 2) {
+  } else if (seconds > EXPECTED_INTERVAL_SECONDS * 2) {
     badgeClass = "badge-warning";
   }
-  return `<span class="badge ${badgeClass}">${formatDuration(avgIntervalMs)}</span>`
-    + ` <span class="small text-muted">(last ${sampleCount})</span>`;
+
+  const frozenNote = status === "online" ? "" : ' <span class="small text-muted">(while last online)</span>';
+  return `<span class="badge ${badgeClass}">${formatDuration(ms)}</span>${frozenNote}`;
 }
 
 function timeSince(date) {
@@ -40,17 +53,18 @@ function timeSince(date) {
   return days + "d ago";
 }
 
-function statusBadge(date) {
-  if (!date) {
-    return '<span class="badge badge-secondary">Never</span>';
-  }
+function statusOf(date) {
+  if (!date) return "never";
   const age = Date.now() - date.getTime();
-  if (age <= ONLINE_THRESHOLD_MS) {
-    return '<span class="badge badge-success">Online</span>';
-  }
-  if (age <= IDLE_THRESHOLD_MS) {
-    return '<span class="badge badge-warning">Idle</span>';
-  }
+  if (age <= ONLINE_THRESHOLD_MS) return "online";
+  if (age <= IDLE_THRESHOLD_MS) return "idle";
+  return "offline";
+}
+
+function statusBadge(status) {
+  if (status === "never") return '<span class="badge badge-secondary">Never</span>';
+  if (status === "online") return '<span class="badge badge-success">Online</span>';
+  if (status === "idle") return '<span class="badge badge-warning">Idle</span>';
   return '<span class="badge badge-danger">Offline</span>';
 }
 
@@ -76,10 +90,11 @@ function renderStatus(statuses) {
   statuses.forEach((s) => {
     // receivedAt is when our server actually got this ping (from Mongo's
     // _id) - reliable regardless of the device's own clock, and what
-    // drives the status badge below. The device's self-reported
-    // "datetime" is only shown as a warning when it disagrees badly.
+    // drives the status below. The device's self-reported "datetime" is
+    // only shown as a warning when it disagrees badly.
     const receivedAt = s.receivedAt ? new Date(s.receivedAt) : null;
     const deviceDate = s.lastData && s.lastData.datetime ? new Date(s.lastData.datetime) : null;
+    const status = statusOf(receivedAt);
 
     let clockWarning = "";
     if (receivedAt && deviceDate && Math.abs(receivedAt.getTime() - deviceDate.getTime()) > CLOCK_MISMATCH_MS) {
@@ -92,8 +107,8 @@ function renderStatus(statuses) {
         <td>${s.deviceId}</td>
         <td>${receivedAt ? receivedAt.toLocaleString() : "&mdash;"}${clockWarning}</td>
         <td>${receivedAt ? timeSince(receivedAt) : "&mdash;"}</td>
-        <td>${intervalCell(s.avgIntervalMs, s.sampleCount)}</td>
-        <td>${statusBadge(receivedAt)}</td>
+        <td>${intervalCell(s.deviceId, status, s.lastGapMs)}</td>
+        <td>${statusBadge(status)}</td>
       </tr>`;
   });
 
