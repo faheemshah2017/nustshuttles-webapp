@@ -2,6 +2,32 @@ const ONLINE_THRESHOLD_MS = 2 * 60 * 1000;   // 2 minutes
 const IDLE_THRESHOLD_MS = 15 * 60 * 1000;    // 15 minutes
 const CLOCK_MISMATCH_MS = 24 * 60 * 60 * 1000; // flag device clock if off by more than a day
 const REFRESH_INTERVAL_MS = 30 * 1000;       // 30 seconds
+const EXPECTED_INTERVAL_SECONDS = 20;        // trackers normally report about every 20s
+
+function formatDuration(ms) {
+  const seconds = Math.round(ms / 1000);
+  if (seconds < 60) return seconds + "s";
+  const minutes = Math.floor(seconds / 60);
+  const remSeconds = seconds % 60;
+  if (minutes < 60) return minutes + "m " + remSeconds + "s";
+  const hours = Math.floor(minutes / 60);
+  return hours + "h " + (minutes % 60) + "m";
+}
+
+function intervalCell(avgIntervalMs, sampleCount) {
+  if (avgIntervalMs == null || sampleCount < 2) {
+    return '<span class="text-muted">Not enough data</span>';
+  }
+  const avgSeconds = avgIntervalMs / 1000;
+  let badgeClass = "badge-success";
+  if (avgSeconds > EXPECTED_INTERVAL_SECONDS * 4) {
+    badgeClass = "badge-danger";
+  } else if (avgSeconds > EXPECTED_INTERVAL_SECONDS * 2) {
+    badgeClass = "badge-warning";
+  }
+  return `<span class="badge ${badgeClass}">${formatDuration(avgIntervalMs)}</span>`
+    + ` <span class="small text-muted">(last ${sampleCount})</span>`;
+}
 
 function timeSince(date) {
   const seconds = Math.floor(Math.max(Date.now() - date.getTime(), 0) / 1000);
@@ -66,12 +92,13 @@ function renderStatus(statuses) {
         <td>${s.deviceId}</td>
         <td>${receivedAt ? receivedAt.toLocaleString() : "&mdash;"}${clockWarning}</td>
         <td>${receivedAt ? timeSince(receivedAt) : "&mdash;"}</td>
+        <td>${intervalCell(s.avgIntervalMs, s.sampleCount)}</td>
         <td>${statusBadge(receivedAt)}</td>
       </tr>`;
   });
 
   document.getElementById("statusTable").innerHTML =
-    rows || '<tr><td colspan="5" class="text-center text-muted">No shuttles found</td></tr>';
+    rows || '<tr><td colspan="6" class="text-center text-muted">No shuttles found</td></tr>';
 }
 
 loadStatus();

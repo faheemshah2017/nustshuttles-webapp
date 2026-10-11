@@ -684,6 +684,7 @@ var data_model = {
     });
   },
   getLastPingPerShuttle: function (shuttlesCollection, shuttlesDataCollection, callback) {
+    const SAMPLE_SIZE = 20;
     shuttlesCollection.find({}).toArray(function (err, shuttles) {
       if (err) throw err;
       if (!shuttles.length) return callback([]);
@@ -698,15 +699,34 @@ var data_model = {
         shuttlesDataCollection
           .find({ deviceId: shuttle.deviceId })
           .sort({ _id: -1 })
-          .limit(1)
+          .limit(SAMPLE_SIZE)
           .toArray(function (err, docs) {
             if (err) throw err;
             const lastData = docs[0] || null;
+
+            // docs are newest-first; gaps between consecutive server
+            // receipt times (from _id, not the device's own clock) give
+            // the actual reporting interval, regardless of device clock
+            // reliability.
+            let gapsMs = [];
+            for (let i = 0; i < docs.length - 1; i++) {
+              const newer = docs[i]._id.getTimestamp().getTime();
+              const older = docs[i + 1]._id.getTimestamp().getTime();
+              gapsMs.push(newer - older);
+            }
+            const avgIntervalMs = gapsMs.length
+              ? gapsMs.reduce((a, b) => a + b, 0) / gapsMs.length
+              : null;
+            const maxIntervalMs = gapsMs.length ? Math.max(...gapsMs) : null;
+
             results.push({
               deviceId: shuttle.deviceId,
               shuttleNumber: shuttle.shuttleNumber,
               lastData: lastData,
               receivedAt: lastData ? lastData._id.getTimestamp() : null,
+              avgIntervalMs: avgIntervalMs,
+              maxIntervalMs: maxIntervalMs,
+              sampleCount: docs.length,
             });
             remaining--;
             if (remaining === 0) {
