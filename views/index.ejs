@@ -360,7 +360,7 @@ function setSummaryMonthly(year,month){
   ];
 
   allShuttlesSum.sort((a, b) =>
-    a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
+    ("" + a._id.shuttleNumber).localeCompare("" + b._id.shuttleNumber, undefined, { numeric: true })
   );
 
   allShuttlesSum.forEach((s) => {
@@ -414,7 +414,7 @@ function setSummaryMonthly(year,month){
 function setIdleGraph(idleTime){
 
   idleTime.sort((a, b) =>
-    a._id.shuttleNumber.localeCompare(b._id.shuttleNumber)
+    ("" + a._id.shuttleNumber).localeCompare("" + b._id.shuttleNumber, undefined, { numeric: true })
   );
 
   idleshuttles = [];

@@ -43,7 +43,7 @@ function loadStatus() {
 
 function renderStatus(statuses) {
   statuses.sort((a, b) =>
-    ("" + a.shuttleNumber).localeCompare("" + b.shuttleNumber)
+    ("" + a.shuttleNumber).localeCompare("" + b.shuttleNumber, undefined, { numeric: true })
   );
 
   let rows = "";

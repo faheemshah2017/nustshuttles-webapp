@@ -303,6 +303,10 @@ function setShuttlesTable(shuttles) {
     $("#table").html("");
     let row = "";
 
+    shuttles = [...shuttles].sort((a, b) =>
+        ("" + a.shuttleNumber).localeCompare("" + b.shuttleNumber, undefined, { numeric: true })
+    );
+
     shuttles.forEach((shuttle, i) => {
 
         row += `<tr><td>${shuttle.deviceId}</td>
