@@ -17,6 +17,8 @@ dist/
 *.log
 
 .env
+config/sys_config.json
+config/*firebase*.json
 
 # Package files
 *.jar
