@@ -6,7 +6,8 @@ year = date.getFullYear();
 
 const yearSelect = document.getElementById("year");
 const startYear = 2022;
-for (let y = startYear; y <= year; y++) {
+const endYear = year + 1; // show next year ahead of time so this never needs manual updates
+for (let y = startYear; y <= endYear; y++) {
   const option = document.createElement("option");
   option.value = y;
   option.text = y;
