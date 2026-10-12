@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const { requireEditor } = require('../lib/permissions');
+const { requireEditor, requireAdmin } = require('../lib/permissions');
 
 authUser = function (req, res, next) {
   if (req.isAuthenticated()) {
@@ -10,7 +10,7 @@ authUser = function (req, res, next) {
   }
 };
 
-router.get('/status', authUser, function (req, res, next) {
+router.get('/status', requireAdmin, function (req, res, next) {
   data = {
     page: 'shuttleStatus',
     title: 'Shuttle Status | Nust Shuttles',
@@ -20,7 +20,7 @@ router.get('/status', authUser, function (req, res, next) {
   res.render('shuttle_status', data);
 });
 
-router.get('/statusData', authUser, function (req, res, next) {
+router.get('/statusData', requireAdmin, function (req, res, next) {
   data_model.getLastPingPerShuttle(col_shuttles, col_shuttlesData, (statuses) => {
     res.send(statuses);
   });
